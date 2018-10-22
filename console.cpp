@@ -5,15 +5,17 @@
 bool set_color(color_t c){
     HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
     SetConsoleTextAttribute(hConsole, c);
+    return true;
 }
 
-bool jump_xy(unsigned int x, unsigned int y) {
+bool jump_xy(int x, int y) {
     if (x < 0) x = 0;
     if (y < 0) y = 0;
     if (x > 50) x = 50;
     if (y > 50) y = 50;
     COORD p = { x, y };
     SetConsoleCursorPosition( GetStdHandle( STD_OUTPUT_HANDLE ), p );
+    return true;
 }
 
 bool clear_screen() {
@@ -32,6 +34,7 @@ bool clear_screen() {
 bool print_nchr(int n, char c){
     for (int i = 0; i < n; i++)
         std::cout << c;
+    return true;
 }
 
 char get_key(void) {
