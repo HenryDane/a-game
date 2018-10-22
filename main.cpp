@@ -4,18 +4,17 @@
 #include <stdlib.h>
 #include <cmath>
 #include <ctime>
-
+#include "main.h"
 #include "console.h"
-
-#define S_WIDTH 50
-#define S_HEIGHT 25
 
 /*
     TODO
     -   add enemies which hunt and also avoid damage
-    -   add horiz/vert weapons
-    -   add particles
+    -   add horizontal / vertical weapons
+    -   add particles / projectiles
     -   add win condition
+    -   add walls
+    -   fix collision detection
 */
 
 struct entity_t {
@@ -86,20 +85,20 @@ int main(){
 
 
     // allocate memory in vectors to avoid issues
-    entities.reserve(40);
-    enemies.reserve(15);
+    entities.reserve(80);
+    enemies.reserve(30);
 
     // generate initial entities
-    for(int i = 0; i < 35; i++){
+    for(int i = 0; i < 75; i++){
         entity_t e;
         e.x = rand() % S_WIDTH;
         e.y = rand() % S_HEIGHT;
-        e.t = rand() % 3;
+        e.t = rand() % 4; // 0-1 : normal, 2 : bomb, 3 : bonus cache
         entities.push_back(e);
     }
 
     // generate initial enemies
-    for (int i = 0; i < 10; i++){
+    for (int i = 0; i < 25; i++){
         enemy_t e;
         e.init(rand() % S_WIDTH, rand() % S_HEIGHT, 0);
         enemies.push_back(e);
@@ -153,15 +152,20 @@ int main(){
         if (cha_x < 0 || cha_y < 0 || cha_x > S_WIDTH || cha_y > S_HEIGHT){
             if (cha_x < 0) cha_x++;
             if (cha_y < 0) cha_y++;
-            if (cha_y >= S_HEIGHT) cha_y--;
-            if (cha_x >= S_WIDTH) cha_x--;
+            if (cha_y > S_HEIGHT) cha_y--;
+            if (cha_x > S_WIDTH) cha_x--;
         }
 
         // entitiy logic
         for (unsigned int i = 0; i < entities.size(); i++){
             if (entities[i].x == cha_x && entities[i].y == cha_y && (entities[i].t == 0 || entities[i].t == 1)) { // regular entities
                 score++;
-                entities[i].t = rand() % 3; // regen entity ....
+                entities[i].t = rand() % 4; // regen entity ....
+                entities[i].x = rand() % S_WIDTH;
+                entities[i].y = rand() % S_HEIGHT;
+            } else if (entities[i].x == cha_x && entities[i].y == cha_y && (entities[i].t == 3)) {
+                score += 5;
+                entities[i].t = rand() % 4; // regen entity ....
                 entities[i].x = rand() % S_WIDTH;
                 entities[i].y = rand() % S_HEIGHT;
             } else if (abs(entities[i].x - cha_x) < 3 && abs(entities[i].y - cha_y) < 3 && entities[i].t == 2){ // bombs
@@ -182,7 +186,7 @@ int main(){
 
                 get_key();
 
-                entities[i].t = rand() % 3;
+                entities[i].t = rand() % 4;
                 entities[i].x = rand() % S_WIDTH;
                 entities[i].y = rand() % S_HEIGHT;
             }
@@ -199,11 +203,16 @@ int main(){
 
             // enemy-entity check
             for (unsigned int j = 0; j < entities.size(); j++){
-                if (entities[j].t == 1 && entities[j].x == enemies[i]._x && entities[j].y == enemies[i]._y){
-                    enemies[i]._score--;
+                if (entities[j].t == 1 && entities[j].x == enemies[i]._x && entities[j].y == enemies[i]._y && (entities[j].t == 0 || entities[j].t == 1)){
+                    enemies[i]._score++;
                     entities[j].x = rand() % S_WIDTH;
                     entities[j].y = rand() % S_HEIGHT;
-                    entities[j].t = rand() % 3;
+                    entities[j].t = rand() % 4;
+                } else if (entities[j].t == 1 && entities[j].x == enemies[i]._x && entities[j].y == enemies[i]._y && (entities[j].t == 3)){
+                    enemies[i]._score += 5;
+                    entities[j].x = rand() % S_WIDTH;
+                    entities[j].y = rand() % S_HEIGHT;
+                    entities[j].t = rand() % 4;
                 } else if  ( abs(entities[j].x - enemies[i]._x) < 3 && abs(entities[j].y - enemies[i]._y) < 3 && entities[j].t == 2) {
                     enemies[i]._score -= 10; // score effect
 
@@ -220,7 +229,7 @@ int main(){
                     std::cout << "!";
                     set_color(color_t::NORMAL);
 
-                    entities[j].t = rand() % 3;
+                    entities[j].t = rand() % 4;
                     entities[j].x = rand() % S_WIDTH;
                     entities[j].y = rand() % S_HEIGHT;
                 }
@@ -234,6 +243,13 @@ int main(){
             shield = 0;
             score = 5;
         }
+
+        // game over check
+        if (score < -20) {
+            clear_screen();
+            std::cout << "Game over";
+            return 0;
+        }
     }
     return 0;
 }
@@ -245,7 +261,7 @@ void draw(void){
     // border
     jump_xy(0, 1);
     print_nchr(S_WIDTH + 1, '=');
-    jump_xy(0, 3 + S_HEIGHT);
+    jump_xync(0, 3 + S_HEIGHT);
     print_nchr(S_WIDTH + 1, '=');
 
     // character
@@ -268,6 +284,11 @@ void draw(void){
             std::cout << "!";
             set_color(color_t::NORMAL);
             break;
+        case 3:
+            set_color(color_t::YELLOW);
+            std::cout << "$";
+            set_color(color_t::NORMAL);
+            break;
         default:
             break;
         }
@@ -285,6 +306,10 @@ void draw(void){
     // score
     jump_xy(0, 0);
     std::cout << score;
+
+    // debug
+    jump_xy(10, 0);
+    std::cout << cha_x << "," << cha_y << " | " << S_WIDTH << "," << S_HEIGHT;
 
     // reset cursor
     jump_xy(0, 0);

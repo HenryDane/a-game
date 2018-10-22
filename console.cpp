@@ -1,4 +1,5 @@
 #include <iostream>
+#include "main.h"
 #include "windows.h"
 #include "console.h"
 
@@ -11,8 +12,14 @@ bool set_color(color_t c){
 bool jump_xy(int x, int y) {
     if (x < 0) x = 0;
     if (y < 0) y = 0;
-    if (x > 50) x = 50;
-    if (y > 50) y = 50;
+    if (x > S_WIDTH) x = S_WIDTH;
+    if (y > S_HEIGHT + 4) y = S_HEIGHT + 4;
+    COORD p = { x, y };
+    SetConsoleCursorPosition( GetStdHandle( STD_OUTPUT_HANDLE ), p );
+    return true;
+}
+
+bool jump_xync(int x, int y) {
     COORD p = { x, y };
     SetConsoleCursorPosition( GetStdHandle( STD_OUTPUT_HANDLE ), p );
     return true;
