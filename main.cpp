@@ -6,103 +6,52 @@
 #include <ctime>
 #include "main.h"
 #include "console.h"
+#include "game.h"
 
 /*
-    TODO
-    -   add enemies which hunt and also avoid damage
-    -   add horizontal / vertical weapons
-    -   add particles / projectiles
-    -   add win condition
-    -   add walls
-    -   fix collision detection
+    types: 0, 1 -> normal
+           2 -> bomb
+           3 -> bonus
+           4 -> wall
 */
 
-struct entity_t {
-    int x;
-    int y;
-    int t;
-};
-
-struct enemy_t {
-    int _x;
-    int _y;
-    int _t;
-    int _score;
-    int _state;
-
-    void init(int x, int y, int t) {
-        _x = x;
-        _y = y;
-        _t = t;
-        _state = 0;
-        _score = 5;
-    }
-
-    void tick(std::vector<entity_t> &e, int cx, int cy){
-        if (_t == 0){
-            // randomwalks
-            _x += rand() % 3 - 1;
-            _y += rand() % 3 - 1;
-        } else if (_t == 1){ // hunter
-            // TODO obj avoid
-            _x -= (_x > cx) ? 1 : ((_x == cx) ? 0 : -1 );
-            _y -= (_y > cy) ? 1 : ((_y == cy) ? 0 : -1 );
-        }
-
-        // boundary check
-        if (_x < 0) _x++;
-        if (_y < 0) _y++;
-        if (_x > S_WIDTH) _x--;
-        if (_y > S_HEIGHT) _y--;
-
-        // score check
-        if (_score < -20) _state = -1;
-    }
-};
+// TODO why does wall generation only work on ';' key event??
 
 // globals lol
-int cha_x = 5;
-int cha_y = 5;
+int cha_x = S_WIDTH / 2;
+int cha_y = S_HEIGHT / 2;
 int score = 5;
 int shield = -1002; // signals first turn
 std::vector<entity_t> entities;
 std::vector<enemy_t> enemies;
 
+// prototypes
 void draw(void);
+void draw_explosion(int x, int y, int r);
 
 int main(){
     // configure random
     srand( time( NULL) );
 
-    std::cout << "                                          " << ((char) 10);
-    std::cout << "   __ _        __ _  __ _ _ __ ___   ___  " << ((char) 10);
-    std::cout << "  / _` |_____ / _\\`|/ _` | '_ ` _ \\ / _ \\ " << ((char) 10);
-    std::cout << " | (_| |_____| (_| | (_| | | | | | |  __/ " << ((char) 10);
-    std::cout << "  \\__,_|      \\__, |\\__,_|_| |_| |_|\\___| " << ((char) 10);
-    std::cout << "              |___/                       " << ((char) 10);
-    std::cout << "                                          " << ((char) 10);
-    std::cout << "       Press any key to begin a game      " << std::endl;
+    set_color(color_t::GREEN);
+    jump_xy(39,9); std::cout << "                                          " << ((char) 10);
+    jump_xy(39,10); std::cout << "   __ _        __ _  __ _ _ __ ___   ___  " << ((char) 10);
+    jump_xy(39,11); std::cout << "  / _` |_____ / _\\`|/ _` | '_ ` _ \\ / _ \\ " << ((char) 10);
+    jump_xy(39,12); std::cout << " | (_| |_____| (_| | (_| | | | | | |  __/ " << ((char) 10);
+    jump_xy(39,13); std::cout << "  \\__,_|      \\__, |\\__,_|_| |_| |_|\\___| " << ((char) 10);
+    jump_xy(39,14); std::cout << "              |___/                       " << ((char) 10);
+    jump_xy(39,15); std::cout << "                                          " << ((char) 10);
+    set_color(color_t::NORMAL);
+    jump_xy(39,16); std::cout << "       Press any key to begin a game      " << std::endl;
 
 
     // allocate memory in vectors to avoid issues
-    entities.reserve(80);
+    entities.reserve(100);
     enemies.reserve(30);
 
-    // generate initial entities
-    for(int i = 0; i < 75; i++){
-        entity_t e;
-        e.x = rand() % S_WIDTH;
-        e.y = rand() % S_HEIGHT;
-        e.t = rand() % 4; // 0-1 : normal, 2 : bomb, 3 : bonus cache
-        entities.push_back(e);
-    }
+    generate_terrain();
 
-    // generate initial enemies
-    for (int i = 0; i < 25; i++){
-        enemy_t e;
-        e.init(rand() % S_WIDTH, rand() % S_HEIGHT, 0);
-        enemies.push_back(e);
-    }
+    player_set_safe();
 
     std::string c;
     while (true) {
@@ -131,7 +80,8 @@ int main(){
             case 'e': // uses a grenade with a cost of 5
                 if (score > 10) {
                     score -= 5;
-                    jump_xy(10, 0);
+                    draw_explosion(cha_x, cha_y, 2);
+                    get_key();
 
                     for (unsigned int i = 0; i < enemies.size(); i++){
                         if (abs(enemies[i]._x - cha_x) < 3 &&
@@ -143,6 +93,7 @@ int main(){
                 }
                 break;
             case 'l': score += 10; break;
+            case ';': generate_terrain(); break;
             default:
                 break;
             }
@@ -160,22 +111,12 @@ int main(){
         for (unsigned int i = 0; i < entities.size(); i++){
             if (entities[i].x == cha_x && entities[i].y == cha_y && (entities[i].t == 0 || entities[i].t == 1)) { // regular entities
                 score++;
-                entities[i].t = rand() % 4; // regen entity ....
-                entities[i].x = rand() % S_WIDTH;
-                entities[i].y = rand() % S_HEIGHT;
+                respawn_entity(i);
             } else if (entities[i].x == cha_x && entities[i].y == cha_y && (entities[i].t == 3)) {
                 score += 5;
-                entities[i].t = rand() % 4; // regen entity ....
-                entities[i].x = rand() % S_WIDTH;
-                entities[i].y = rand() % S_HEIGHT;
+                respawn_entity(i);
             } else if (abs(entities[i].x - cha_x) < 3 && abs(entities[i].y - cha_y) < 3 && entities[i].t == 2){ // bombs
-                set_color(color_t::BRIGHT_RED);
-                for (int k = -2; k <= 2; k++){
-                    for (int m = -2; m <= 2; m++){
-                        jump_xy(entities[i].x + k, entities[i].y + m + 2);
-                        std::cout << "*";
-                    }
-                }
+                draw_explosion(entities[i].x, entities[i].y, 2);
                 set_color(color_t::DARK_RED);
 
                 if (shield <= 0) score -= 10;
@@ -186,9 +127,7 @@ int main(){
 
                 get_key();
 
-                entities[i].t = rand() % 4;
-                entities[i].x = rand() % S_WIDTH;
-                entities[i].y = rand() % S_HEIGHT;
+                respawn_entity(i);
             }
         }
         // enemy logic
@@ -205,33 +144,13 @@ int main(){
             for (unsigned int j = 0; j < entities.size(); j++){
                 if (entities[j].t == 1 && entities[j].x == enemies[i]._x && entities[j].y == enemies[i]._y && (entities[j].t == 0 || entities[j].t == 1)){
                     enemies[i]._score++;
-                    entities[j].x = rand() % S_WIDTH;
-                    entities[j].y = rand() % S_HEIGHT;
-                    entities[j].t = rand() % 4;
+                    respawn_entity(j);
                 } else if (entities[j].t == 1 && entities[j].x == enemies[i]._x && entities[j].y == enemies[i]._y && (entities[j].t == 3)){
                     enemies[i]._score += 5;
-                    entities[j].x = rand() % S_WIDTH;
-                    entities[j].y = rand() % S_HEIGHT;
-                    entities[j].t = rand() % 4;
+                    respawn_entity(j);
                 } else if  ( abs(entities[j].x - enemies[i]._x) < 3 && abs(entities[j].y - enemies[i]._y) < 3 && entities[j].t == 2) {
                     enemies[i]._score -= 10; // score effect
-
-                    // visual effect
-                    set_color(color_t::BRIGHT_RED);
-                    for (int k = -2; k <= 2; k++){
-                        for (int m = -2; m <= 2; m++){
-                            jump_xy(entities[j].x + k, entities[j].y + m + 2);
-                            std::cout << "*";
-                        }
-                    }
-                    set_color(color_t::DARK_RED);
-                    jump_xy(entities[j].x, entities[j].y + 2);
-                    std::cout << "!";
-                    set_color(color_t::NORMAL);
-
-                    entities[j].t = rand() % 4;
-                    entities[j].x = rand() % S_WIDTH;
-                    entities[j].y = rand() % S_HEIGHT;
+                    respawn_entity(j);
                 }
             }
         }
@@ -289,6 +208,8 @@ void draw(void){
             std::cout << "$";
             set_color(color_t::NORMAL);
             break;
+        case 4:
+            std::cout << "#";  break;
         default:
             break;
         }
@@ -299,7 +220,7 @@ void draw(void){
         jump_xy(e._x, e._y + 2);
         if (e._state >= 0) set_color(color_t::LT_BLUE);
         if (e._state < 0) set_color(color_t::DEAD);
-        std::cout << "#";
+        std::cout << "O";
         set_color(color_t::NORMAL);
     }
 
@@ -313,4 +234,15 @@ void draw(void){
 
     // reset cursor
     jump_xy(0, 0);
+}
+
+void draw_explosion(int x, int y, int r){
+    set_color(color_t::BRIGHT_RED);
+    for (int k = -r; k <= r; k++){
+        for (int m = -r; m <= r; m++){
+            jump_xy(x + k, y + m + 2);
+            std::cout << "*";
+        }
+    }
+    set_color(color_t::NORMAL);
 }
