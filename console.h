@@ -8,3 +8,5 @@ bool jump_xync(int x, int y);
 bool clear_screen(void);
 bool print_nchr(int n, char c);
 char get_key(void);
+
+void do_msg(std::string msg);

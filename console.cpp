@@ -60,3 +60,7 @@ char get_key(void) {
     return c;
 }
 
+void do_msg(std::string msg){
+    MessageBox(0, msg.c_str(), "Note: ", MB_OK);
+}
+

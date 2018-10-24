@@ -1,6 +1,8 @@
 #include "main.h"
+#include "interact.h"
 
 bool respawn_entity(int idx){
+    // TODO edit registration
     int x = rand() % S_WIDTH;
     int y = rand() % S_HEIGHT;
     while (abs(x - cha_x) <= 4 ||
@@ -9,9 +11,8 @@ bool respawn_entity(int idx){
         y = rand() % S_HEIGHT;
     }
 
-    entities[idx].t = rand() % 4;
-    entities[idx].x = x;
-    entities[idx].y = y;
+    entities[idx].x = x; //x;
+    entities[idx].y = y; //y;
     return true;
 }
 
@@ -21,6 +22,7 @@ bool make_entity_at(int x, int y, int t){
     e.y = y;
     e.t = t;
     entities.push_back(e);
+    register_object(global_uuid_next++, 0 /*entity*/, entities.size() - 1, t);
     return true;
 }
 
@@ -64,28 +66,15 @@ bool generate_terrain( void ){
         }
     }
 
-    /*
     for (int i = 0; i < 60; i++){
         make_entity_at(rand() % S_WIDTH, rand() % S_HEIGHT, rand() % 4);
     }
 
-    for (int i = 0; i < entities.size(); i++){
-        if (entities[i].t == 2) respawn_entity(i);
-    }
-
     for (int i = 0; i < 10; i++){
         enemy_t e;
-        e.init(rand() % S_WIDTH, rand() % S_HEIGHT, 0);
+        e.init(rand() % S_WIDTH, rand() % S_HEIGHT, 0, global_uuid_next++);
         enemies.push_back(e);
-    }*/
-
-    // clean up entities
-    for (int i = 0; i < entities.size(); i++){
-        if (entities[i].x >= S_WIDTH || entities[i].x < 0 ||
-            entities[i].y >= S_HEIGHT || entities[i].y < 0) {
-            entities.erase(entities.begin() + i);
-            i--;
-        }
+        register_object(e._id, 1 /*entity*/, i, 0);
     }
 
     return true;
@@ -99,4 +88,27 @@ bool player_set_safe(void){
         }
     }
 
+}
+
+void tick_enemy(enemy_t &en, std::vector<entity_t> &e, int cx, int cy){
+    if (en._state < 0) return;
+    if (en._score < -20) return;
+
+    int dx = 0;
+    int dy = 0;
+
+    if (en._t == 0){
+        // randomwalks
+        dx = rand() % 3 - 1;
+        dy = rand() % 3 - 1;
+    } else if (en._t == 1){ // hunter
+        // TODO obj avoid
+        dx = (en._x > cx) ? 1 : ((en._x == cx) ? 0 : -1 );
+        dy = (en._y > cy) ? 1 : ((en._y == cy) ? 0 : -1 );
+    }
+
+    update_object(en._id, dx, dy);
+
+    // score check
+    if (en._score < -20) en._state = -1000;
 }

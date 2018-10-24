@@ -1,12 +1,11 @@
 #include <vector>
+#include <iostream>
+#include "windows.h"
+#include "patch.h"
 #include "main.h"
-
-struct registry_key_t {
-    int id;
-    int ridx;
-    int type; // 0 = entity, 1 = enemy, 2 = character
-    int rtype;
-};
+#include "interact.h"
+#include "console.h"
+#include "game.h"
 
 std::vector<registry_key_t> registry;
 
@@ -20,6 +19,8 @@ bool register_object(int id, int type, int ridx, int rtype){
     rk.id = id;
     rk.type = type;
     rk.ridx = ridx;
+    rk.rtype = rtype;
+    registry.push_back(rk);
 }
 
 bool get_registry_xy(int id, int &x, int &y){
@@ -66,24 +67,60 @@ takes the objects registry id, and its planned movement, and checks for issues
 bool update_object (int id, int dx, int dy){
     int x = -1;
     int y = -1;
-    get_registry_xy(id, x, y);
+    if (id > 0) get_registry_xy(id, x, y);
+    if (id == 0) {
+        x = cha_x;
+        y = cha_y;
+    }
+
+    x += dx;
+    y += dy;
 
     // border check
-    if (x + dx > S_WIDTH ||
-        x + dx < 0 ||
-        y + dy > S_HEIGHT ||
-        y + dy < 0)
+    if (x > S_WIDTH ||
+        x < 0 ||
+        y > S_HEIGHT ||
+        y < 0){
         return false;
+    }
 
     // wall check
     for (int i = 0; i < entities.size(); i++){
-        if (entities[i].x == x + dx && entities[i].y == y + dy && entities[i].t == 4){ // walls
+        if (entities[i].x == x && entities[i].y == y && entities[i].t == 4){ // walls
             return false;
         }
     }
 
     // approve change
-    x += dx;
-    y += dy;
     set_registry_xy(id, x, y);
+
+    // interaction check
+    for (int i = 0; i < registry.size(); i++){
+        if (i == id) continue; // no self-interaction
+
+        int x1 = -1; int y1 = -1; get_registry_xy(i, x1, y1); // get xy values of object
+
+        if (x == x1 && y == y1) { // exact colission
+            if (registry[i].type == 0 && (registry[i].rtype == 1 || registry[i].rtype == 0)){ // 0 or 1 entity
+                if (registry[id].type == 2) score++;
+                if (registry[id].type == 1) enemies[registry[id].ridx]._score++;
+                respawn_entity(registry[i].ridx);
+            } else if (registry[i].type == 0 && registry[i].rtype == 3) { // bonus coin
+                if (registry[id].type == 2) score += 5;
+                if (registry[id].type == 1) enemies[registry[id].ridx]._score += 5;
+                respawn_entity(registry[i].ridx);
+            } else if (registry[i].type == 1) {
+                if (registry[id].type == 2) score -= 200;
+                if (registry[id].type == 1) enemies[registry[id].ridx]._score -= 200;
+            }
+        } else if (abs(x - x1) <= 2 && abs(y - y1) <= 2){ // radius = 2
+            if (registry[i].type == 0 && registry[i].rtype == 2){ // bomb
+                if (registry[id].type == 2) score -= 10;
+                if (registry[id].type == 1) enemies[registry[id].ridx]._score -= 10;
+                draw_explosion(x1, y1, 2);
+                respawn_entity(registry[i].ridx);
+                get_key(); // wait for react
+            }
+        }
+    }
 }
