@@ -1,18 +1,25 @@
+#include <iostream>
+#include "console.h"
 #include "main.h"
 #include "interact.h"
 
 bool respawn_entity(int idx){
-    // TODO edit registration
-    int x = rand() % S_WIDTH;
-    int y = rand() % S_HEIGHT;
-    while (abs(x - cha_x) <= 4 ||
-           abs(y - cha_y) <= 4) {
-        x = rand() % S_WIDTH;
-        y = rand() % S_HEIGHT;
-    }
+    if (regen_on){
+        // TODO edit registration
+        int x = rand() % S_WIDTH;
+        int y = rand() % S_HEIGHT;
+        while (abs(x - cha_x) <= 4 ||
+               abs(y - cha_y) <= 4) {
+            x = rand() % S_WIDTH;
+            y = rand() % S_HEIGHT;
+        }
 
-    entities[idx].x = x; //x;
-    entities[idx].y = y; //y;
+        entities[idx].x = x; //x;
+        entities[idx].y = y; //y;
+    } else {
+        entities[idx].x = -10;
+        entities[idx].y = -10;
+    }
     return true;
 }
 
@@ -24,6 +31,37 @@ bool make_entity_at(int x, int y, int t){
     entities.push_back(e);
     register_object(global_uuid_next++, 0 /*entity*/, entities.size() - 1, t);
     return true;
+}
+
+bool generate_pacman(void) {
+    cha_x = S_WIDTH / 2;
+    cha_y = S_HEIGHT / 2;
+    entities.clear();
+    enemies.clear();
+    regen_on = false;
+
+    for (int i = 0; i < S_WIDTH + 1; i++){
+        for (int j = 0; j < S_HEIGHT + 1; j++){
+            if ((i == 0 && j == 0) ||
+                (i == S_WIDTH && j == 0 ) ||
+                (i == S_WIDTH && j == S_HEIGHT) ||
+                (i == 0 && j == S_HEIGHT)) continue;
+
+            int k = rand() % 10;
+            if (k == 0 || k == 1){
+                make_entity_at(i, j, 4);
+            } else if (k == 2 || k == 3 || k == 4) {
+                make_entity_at(i, j, 2);
+            } else {
+                make_entity_at(i, j, (rand() % 3 == 0) ? 3 : 1);
+            }
+        }
+    }
+
+    make_entity_at(0, 0, 5);
+    make_entity_at(S_WIDTH, 0, 5);
+    make_entity_at(S_WIDTH, S_HEIGHT, 5);
+    make_entity_at(0, S_HEIGHT, 5);
 }
 
 bool generate_terrain( void ){
@@ -77,6 +115,11 @@ bool generate_terrain( void ){
         register_object(e._id, 1 /*entity*/, i, 0);
     }
 
+    make_entity_at(0, 0, 5);
+    make_entity_at(S_WIDTH, 0, 5);
+    make_entity_at(S_WIDTH, S_HEIGHT, 5);
+    make_entity_at(0, S_HEIGHT, 5);
+
     return true;
 }
 
@@ -111,4 +154,44 @@ void tick_enemy(enemy_t &en, std::vector<entity_t> &e, int cx, int cy){
 
     // score check
     if (en._score < -20) en._state = -1000;
+}
+
+void do_gen_next_level(void){
+    registry.clear();
+    global_uuid_next = 0;
+
+    global_score += score;
+    score = 0;
+
+    // print start screen
+    clear_screen();
+    set_color(color_t::NORMAL);
+    jump_xy(39,16); std::cout << "              l e v e l   "; set_color(color_t::DARK_RED); std::cout << "# " << level << "             " << ((char) 10);
+    set_color(color_t::NORMAL);
+    jump_xy(39,18); std::cout << "         Welcome to the next level!      " << std::endl;
+    jump_xy(39,18); std::cout << "       Press any key to begin a game      " << std::endl;
+
+    register_object(global_uuid_next++, 2, 0, 0);
+
+    switch(level){
+    case 0:
+    case 1:
+        generate_terrain();
+        break;
+    case 2:
+        generate_pacman();
+        break;
+    default:
+        break;
+    }
+
+    cha_x = S_WIDTH / 2;
+    cha_y = S_HEIGHT / 2;
+    player_set_safe(); // go to safe location
+
+    get_key();
+
+    draw();
+
+    get_key();
 }

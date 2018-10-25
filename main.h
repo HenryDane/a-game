@@ -9,7 +9,7 @@
 struct entity_t {
     int x;
     int y;
-    int t;
+    int t; // 0, 1 -> normal, 2 -> bomb, 3 -> coin, 4 -> wall, 5 -> exit
 };
 
 struct enemy_t {
@@ -33,11 +33,16 @@ struct enemy_t {
 extern int cha_x;
 extern int cha_y;
 extern int score;
+extern int global_score;
 extern int shield; // signals first turn
 extern std::vector<entity_t> entities;
 extern std::vector<enemy_t> enemies;
 
+extern int level;
+
 extern int global_uuid_next;
+
+extern bool regen_on;
 
 // prototypes
 void draw(void);

@@ -112,10 +112,13 @@ bool update_object (int id, int dx, int dy){
             } else if (registry[i].type == 1) {
                 if (registry[id].type == 2) score -= 200;
                 if (registry[id].type == 1) enemies[registry[id].ridx]._score -= 200;
+            } else if (registry[i].type == 0 && registry[i].rtype == 5) {// exit
+                level++;
+                do_gen_next_level();
             }
         } else if (abs(x - x1) <= 2 && abs(y - y1) <= 2){ // radius = 2
             if (registry[i].type == 0 && registry[i].rtype == 2){ // bomb
-                if (registry[id].type == 2) score -= 10;
+                if (registry[id].type == 2 && shield == 0) score -= 10;
                 if (registry[id].type == 1) enemies[registry[id].ridx]._score -= 10;
                 draw_explosion(x1, y1, 2);
                 respawn_entity(registry[i].ridx);
