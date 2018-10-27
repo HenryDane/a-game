@@ -10,6 +10,10 @@
 #include "interact.h"
 
 // TODO add levels and level 10 = win
+//      add turn counter flag
+//      add laser entities
+//      add timeplus entities
+//      add make lasers collide with walls
 
 // globals lol
 int cha_x = S_WIDTH / 2;
@@ -104,9 +108,9 @@ int main(){
         draw();
 
         for (int i = 0; i < enemies.size(); i++){
-            enemy_t e = enemies[i];
-            tick_enemy(e, entities, cha_x, cha_y);
-            enemies[i] = e;
+            //enemy_t e = enemies[i];
+            tick_enemy(enemies[i], entities, cha_x, cha_y);
+            //enemies[i] = e;
         }
 
         // first 3 turns are immune to score changes

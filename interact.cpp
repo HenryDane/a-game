@@ -114,7 +114,10 @@ bool update_object (int id, int dx, int dy){
                 if (registry[id].type == 1) enemies[registry[id].ridx]._score -= 200;
             } else if (registry[i].type == 0 && registry[i].rtype == 5) {// exit
                 level++;
+                cha_x = S_WIDTH / 2;
+                cha_y = S_HEIGHT / 2;
                 do_gen_next_level();
+                return true;
             }
         } else if (abs(x - x1) <= 2 && abs(y - y1) <= 2){ // radius = 2
             if (registry[i].type == 0 && registry[i].rtype == 2){ // bomb

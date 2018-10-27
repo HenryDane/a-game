@@ -33,9 +33,29 @@ bool make_entity_at(int x, int y, int t){
     return true;
 }
 
+bool generate_empty(void){
+    regen_on = true;
+
+    entities.clear();
+    enemies.clear();
+
+    return true;
+}
+
+bool generate_lasers(void) {
+    regen_on = true;
+
+    entities.clear();
+    enemies.clear();
+
+
+
+    return true;
+}
+
 bool generate_pacman(void) {
-    cha_x = S_WIDTH / 2;
-    cha_y = S_HEIGHT / 2;
+    //cha_x = S_WIDTH / 2;
+    //cha_y = S_HEIGHT / 2;
     entities.clear();
     enemies.clear();
     regen_on = false;
@@ -62,9 +82,13 @@ bool generate_pacman(void) {
     make_entity_at(S_WIDTH, 0, 5);
     make_entity_at(S_WIDTH, S_HEIGHT, 5);
     make_entity_at(0, S_HEIGHT, 5);
+
+    return true;
 }
 
 bool generate_terrain( void ){
+    cha_x = S_WIDTH / 2;
+    cha_y = S_HEIGHT / 2;
     entities.clear();
     enemies.clear();
 
@@ -182,6 +206,7 @@ void do_gen_next_level(void){
         generate_pacman();
         break;
     default:
+        generate_empty();
         break;
     }
 
@@ -189,9 +214,5 @@ void do_gen_next_level(void){
     cha_y = S_HEIGHT / 2;
     player_set_safe(); // go to safe location
 
-    get_key();
-
     draw();
-
-    get_key();
 }
