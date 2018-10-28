@@ -25,6 +25,16 @@ bool jump_xync(int x, int y) {
     return true;
 }
 
+bool paint_grid() {
+    for (int y = 0; y <= S_HEIGHT; y++){
+        jump_xy(0, y + 2);
+        for (int x = 0; x <= S_WIDTH; x++){
+            std::cout << ".";
+        }
+    }
+    return true;
+}
+
 bool clear_screen() {
     char fill = ' ';
     COORD tl = {0,0};

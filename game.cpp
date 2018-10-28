@@ -141,6 +141,17 @@ bool generate_terrain( void ){
     entities.clear();
     enemies.clear();
 
+    for (int i = 0; i < 60; i++){
+        make_entity_at(rand() % S_WIDTH, rand() % S_HEIGHT, rand() % 4);
+    }
+
+    for (int i = 0; i < 10; i++){
+        enemy_t e;
+        e.init(rand() % S_WIDTH, rand() % S_HEIGHT, 0, global_uuid_next++);
+        enemies.push_back(e);
+        register_object(e._id, 1 /*entity*/, i, 0);
+    }
+
     for (int i = 0; i < 20; i++){
         int x = rand() % S_WIDTH;
         int y = rand() % S_HEIGHT;
@@ -175,17 +186,6 @@ bool generate_terrain( void ){
         default:
             break;
         }
-    }
-
-    for (int i = 0; i < 60; i++){
-        make_entity_at(rand() % S_WIDTH, rand() % S_HEIGHT, rand() % 4);
-    }
-
-    for (int i = 0; i < 10; i++){
-        enemy_t e;
-        e.init(rand() % S_WIDTH, rand() % S_HEIGHT, 0, global_uuid_next++);
-        enemies.push_back(e);
-        register_object(e._id, 1 /*entity*/, i, 0);
     }
 
     make_entity_at(0, 0, 5);

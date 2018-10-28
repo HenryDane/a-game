@@ -34,7 +34,7 @@ int main(){
     srand( time( NULL) );
 
     // print start screen
-    jump_xy(0, 0); std::cout << "Version 0.1.0000";
+    jump_xy(0, 0); std::cout << "Version 0.1.0003";
     set_color(color_t::GREEN);
     jump_xy(39, 9); std::cout << "                                          " << ((char) 10);
     jump_xy(39, 10); std::cout << "   __ _        __ _  __ _ _ __ ___   ___  " << ((char) 10);
@@ -163,6 +163,7 @@ int main(){
 void draw(void){
     // draw logic
     clear_screen();
+    paint_grid();
 
     // character
     set_color(color_t::GREEN);
@@ -180,7 +181,7 @@ void draw(void){
         case 0:
             std::cout << "+"; break;
         case 2:
-            set_color(color_t::DARK_RED);
+            set_color(color_t::BRIGHT_RED);
             std::cout << "!";
             set_color(color_t::NORMAL);
             break;
