@@ -1,4 +1,10 @@
+v0.1.next
+- made grid optional
+- put text under character
+- removed debug stuff
+- prettified tutorial screen
+
 v0.1.0003
 - brightened bombs
-+ added grid
+- added grid
 - fixed stacking of items

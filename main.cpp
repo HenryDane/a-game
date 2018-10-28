@@ -29,12 +29,14 @@ int timer_on = -1;
 int global_score = 0;
 int level = 0;
 
+bool dots_on = false;
+
 int main(){
     // configure random
     srand( time( NULL) );
 
     // print start screen
-    jump_xy(0, 0); std::cout << "Version 0.1.0003";
+    jump_xy(0, 0); std::cout << "Version 0.1.0007";
     set_color(color_t::GREEN);
     jump_xy(39, 9); std::cout << "                                          " << ((char) 10);
     jump_xy(39, 10); std::cout << "   __ _        __ _  __ _ _ __ ___   ___  " << ((char) 10);
@@ -76,6 +78,11 @@ int main(){
 
         // control logic
         switch (c){
+        case 'g':
+            dots_on = !dots_on;
+            draw();
+            continue;
+            break;
         case 't': // tutorial skip
             if (level == 0){
                 level++;
@@ -124,10 +131,10 @@ int main(){
                 }
             }
             break;
-        case 'l': score += 10; break;
-        case ';': generate_terrain(); break;
-        case 'n': damage_object_x(cha_x, 0); break;
-        case 'm': damage_object_y(cha_y, 0); break;
+        //case 'l': score += 10; break;
+        //case ';': generate_terrain(); break;
+        //case 'n': damage_object_x(cha_x, 0); break;
+        //case 'm': damage_object_y(cha_y, 0); break;
         default:
             update_object(0, 0, 0);
             break;
@@ -135,11 +142,6 @@ int main(){
 
         // draw screen
         draw();
-
-        // draw tutorial stuff
-        if (level == 0){
-            draw_level_text();
-        }
 
         for (unsigned int i = 0; i < enemies.size(); i++){
             tick_enemy(enemies[i], entities, cha_x, cha_y);
@@ -163,7 +165,12 @@ int main(){
 void draw(void){
     // draw logic
     clear_screen();
-    paint_grid();
+    if (dots_on) paint_grid();
+
+    // draw tutorial stuff
+    if (level == 0){
+        draw_level_text();
+    }
 
     // character
     set_color(color_t::GREEN);
@@ -280,7 +287,7 @@ void draw_level_screen(int lvl){
     }
     set_color(color_t::NORMAL);
     jump_xy(47, 19); std::cout << "Press any key to begin";
-    get_key();
+    //get_key();
 }
 
 void do_win_screen() {
@@ -333,7 +340,6 @@ void do_death_screen() {
     jump_xy(x, y + 6); std::cout << "                   Score: " << score << NL;
 
     get_key();
-    get_key();
 
     exit(0);
 
@@ -355,28 +361,44 @@ void draw_level_text(){
         jump_xy(40,11);
         std::cout << "Collect '+' tokens for +1 score";
         jump_xy(45,12);
-        std::cout << "Collect '$' tokens for +5 score";
+        std::cout << "Collect '";
+        set_color(color_t::YELLOW);
+        std::cout << "$";
+        set_color(color_t::NORMAL);
+        std::cout << "' tokens for +5 score";
     }
     if (cha_x > 55) {
         jump_xy(50,16);
-        std::cout << "Avoid '!' bombs. They have a radius of 2.";
+        std::cout << "Avoid '";
+        set_color(color_t::BRIGHT_RED);
+        std::cout << "!";
+        set_color(color_t::NORMAL);
+        std::cout << "' bombs. They have a radius of 2.";
         jump_xy(55,17);
         std::cout << "They do damage of -10 to your score.";
     }
     if (cha_x > 65) {
         jump_xy(60,20);
-        std::cout << "Enemies 'O' subtract 200 from your score.";
+        std::cout << "Enemies '";
+        set_color(color_t::LT_BLUE);
+        std::cout << "O";
+        set_color(color_t::NORMAL);
+        std::cout << "' subtract 200 from your score.";
     }
 
     if (cha_x > 75) {
         jump_xy(0, 23);
-        std::cout << "Doors 'D' take you to the next level.";
+        std::cout << "Doors '";
+        set_color(color_t::GR_GREEN);
+        std::cout << "D";
+        set_color(color_t::NORMAL);
+        std::cout << "' take you to the next level.";
         jump_xy(0, 24);
         std::cout << "Press 'q' to activate your shield and protect yourself from bombs (only works if your score is above ten).";
         jump_xy(0, 25);
         std::cout << "Press 'e' to use a grenade on surrounding enemies (only works if your score is above five).";
         jump_xy(0, 27);
-        set_color(color_t::GREEN);
+        set_color(color_t::DEAD);
         std::cout << "Good night, and good luck.";
         set_color(color_t::NORMAL);
     }
