@@ -29,7 +29,7 @@ int timer_on = -1;
 int global_score = 0;
 int level = 0;
 
-bool dots_on = false;
+bool dots_on = false; // flag for dots display
 
 int main(){
     // configure random
@@ -387,16 +387,20 @@ void draw_level_text(){
     }
 
     if (cha_x > 75) {
-        jump_xy(0, 23);
+        jump_xy(0, 4);
+        std::cout << "Press 'g' to turn on and off dots in the background. This does not effect gameplay.";
+        jump_xy(0, 5);
+        std::cout << "Press 'q' to activate your shield and protect yourself from bombs (only works if your score is above ten).";
+        jump_xy(0, 6);
+        std::cout << "Press 'e' to use a grenade on surrounding enemies (only works if your score is above five).";
+        jump_xy(0, 24);
         std::cout << "Doors '";
         set_color(color_t::GR_GREEN);
         std::cout << "D";
         set_color(color_t::NORMAL);
         std::cout << "' take you to the next level.";
-        jump_xy(0, 24);
-        std::cout << "Press 'q' to activate your shield and protect yourself from bombs (only works if your score is above ten).";
         jump_xy(0, 25);
-        std::cout << "Press 'e' to use a grenade on surrounding enemies (only works if your score is above five).";
+        std::cout << "Game over occurs when your score is less than -20. Don't let it get that low.";jump_xy(0, 25);
         jump_xy(0, 27);
         set_color(color_t::DEAD);
         std::cout << "Good night, and good luck.";

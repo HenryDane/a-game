@@ -3,6 +3,7 @@ v0.1.next
 - put text under character
 - removed debug stuff
 - prettified tutorial screen
+- add more info to tutorial
 
 v0.1.0003
 - brightened bombs
