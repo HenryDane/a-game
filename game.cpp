@@ -37,11 +37,40 @@ bool make_entity_at(int x, int y, int t){
 
 bool generate_empty(void){
     regen_on = true;
+    timer_on = -1;
 
     entities.clear();
     enemies.clear();
 
     return true;
+}
+
+bool generate_tutorial(void){
+    regen_on = false;
+    timer_on = -1;
+
+    entities.clear();
+    enemies.clear();
+
+    cha_x = 2; cha_y = S_HEIGHT / 2;
+
+    make_entity_at(30, (S_HEIGHT / 2) + 1, 4 );
+    make_entity_at(30, (S_HEIGHT / 2) - 1, 4 );
+
+    make_entity_at(50, S_HEIGHT / 2, 1);
+
+    make_entity_at(55, S_HEIGHT / 2, 3);
+    make_entity_at(56, S_HEIGHT / 2, 3);
+
+    make_entity_at(60, S_HEIGHT / 2, 2);
+
+    make_entity_at(69, S_HEIGHT / 2, 4);
+    enemy_t enemy;
+    enemy.init(70, S_HEIGHT / 2, -1, global_uuid_next++);
+    enemies.push_back(enemy);
+    register_object(enemy._id, 1, 0, -1);
+
+    make_entity_at(80, S_HEIGHT / 2, 5);
 }
 
 bool generate_lasers(void) {
@@ -310,24 +339,25 @@ void do_gen_next_level(void){
     switch(level){
     case 0:
     case 1:
-        generate_terrain();
-        break;
     case 2:
-        generate_pacman();
+        generate_terrain();
         break;
     case 3:
+        generate_pacman();
+        break;
     case 4:
+    case 5:
         generate_lasers();
         break;
-    case 5:
+    case 6:
         generate_safe_run();
         break;
-    case 6:
     case 7:
     case 8:
+    case 9:
         generate_terrain();
         break;
-    case 9:
+    case 10:
         generate_boss();
         break;
     default:

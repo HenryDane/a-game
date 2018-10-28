@@ -12,7 +12,6 @@
 #include "tex_print.h"
 
 // TODO add selective redraw
-//      add tutorial level
 //      make game victory on final door exit not timer fix
 
 // globals lol
@@ -56,7 +55,7 @@ int main(){
 
     register_object(global_uuid_next++, 2, 0, 0); // register player
 
-    generate_terrain();
+    generate_tutorial();
 
     player_set_safe(); // go to safe location
 
@@ -69,14 +68,23 @@ int main(){
 
         if (shield > 0) shield--; // decrease shield
         if (timer_on > 0) timer_on --;
-        if (timer_on == 0 && level == 9){
+        if (timer_on == 0 && level == 10){
             do_win_screen();
-        } else if (timer_on == 0 && level != 9) {
+        } else if (timer_on == 0 && level != 10) {
             score -= 1000;
         }
 
         // control logic
         switch (c){
+        case 't': // tutorial skip
+            if (level == 0){
+                level++;
+                cha_x = S_WIDTH / 2;
+                cha_y = S_HEIGHT / 2;
+                do_gen_next_level();
+                continue;
+            }
+            break;
         case 'w':
             update_object(0, 0, -1);
             break;
@@ -91,18 +99,18 @@ int main(){
             break;
         case 'q':
             if (score > 10 &&
-                level != 6 &&
                 level != 7 &&
-                level != 8) { // activates ten turn shield for a score cost of 5
+                level != 8 &&
+                level != 9) { // activates ten turn shield for a score cost of 5
                 shield = 10;
                 score -= 5;
             }
             break;
         case 'e': // uses a grenade with a cost of 5
             if (score > 10 &&
-                level != 6 &&
                 level != 7 &&
-                level != 8) {
+                level != 8 &&
+                level != 9) {
                 score -= 5;
                 draw_explosion(cha_x, cha_y, 2);
                 get_key();
@@ -127,6 +135,11 @@ int main(){
 
         // draw screen
         draw();
+
+        // draw tutorial stuff
+        if (level == 0){
+            draw_level_text();
+        }
 
         for (unsigned int i = 0; i < enemies.size(); i++){
             tick_enemy(enemies[i], entities, cha_x, cha_y);
@@ -222,6 +235,7 @@ void draw(void){
     } else {
         std::cout << " TURNS:" << timer_on;
     }
+    std::cout << " LEVEL:" << level;
 
     // debug
     jump_xy(10, 0);
@@ -322,4 +336,47 @@ void do_death_screen() {
 
     exit(0);
 
+}
+
+void draw_level_text(){
+    jump_xy(0, 2);
+    std::cout << "Press 't' to skip this tutorial";
+
+    if (cha_x > 0) {
+        jump_xy(0,9);
+        std::cout << "Use WASD to move";
+    }
+    if (cha_x > 25) {
+        jump_xy(20,10);
+        std::cout << "Avoid walls '#' ";
+    }
+    if (cha_x > 45) {
+        jump_xy(40,11);
+        std::cout << "Collect '+' tokens for +1 score";
+        jump_xy(45,12);
+        std::cout << "Collect '$' tokens for +5 score";
+    }
+    if (cha_x > 55) {
+        jump_xy(50,16);
+        std::cout << "Avoid '!' bombs. They have a radius of 2.";
+        jump_xy(55,17);
+        std::cout << "They do damage of -10 to your score.";
+    }
+    if (cha_x > 65) {
+        jump_xy(60,20);
+        std::cout << "Enemies 'O' subtract 200 from your score.";
+    }
+
+    if (cha_x > 75) {
+        jump_xy(0, 23);
+        std::cout << "Doors 'D' take you to the next level.";
+        jump_xy(0, 24);
+        std::cout << "Press 'q' to activate your shield and protect yourself from bombs (only works if your score is above ten).";
+        jump_xy(0, 25);
+        std::cout << "Press 'e' to use a grenade on surrounding enemies (only works if your score is above five).";
+        jump_xy(0, 27);
+        set_color(color_t::GREEN);
+        std::cout << "Good night, and good luck.";
+        set_color(color_t::NORMAL);
+    }
 }

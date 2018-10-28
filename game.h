@@ -5,6 +5,7 @@ bool generate_terrain(void);
 bool generate_lasers(void);
 bool generate_safe_run(void);
 bool generate_boss(void);
+bool generate_tutorial(void);
 
 bool player_set_safe(void);
 bool make_entity_at(int x, int y, int t);
