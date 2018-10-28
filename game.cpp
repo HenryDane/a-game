@@ -58,6 +58,7 @@ bool generate_lasers(void) {
         enemy_t e;
         e.init(rand() % S_WIDTH, rand() % S_HEIGHT, rand() % 2 + 2, global_uuid_next++);
         enemies.push_back(e);
+        e._score = 100000;
         //register_object(global_uuid_next++, 1, enemies)
         register_object(e._id, 1 /*entity*/, i, 0);
     }
@@ -186,30 +187,43 @@ bool generate_boss(void){
     enemies.clear();
 
     regen_on = false;
-    timer_on = -10;
+    timer_on = 50;
 
     for (int i = 0; i < 50; i++){
         make_entity_at(rand() % S_WIDTH, rand() % S_HEIGHT, 3);
         make_entity_at(rand() % S_WIDTH, rand() % S_HEIGHT, 2);
     }
 
+    make_entity_at(cha_x - 1, cha_y - 1, 3);
+    make_entity_at(cha_x, cha_y - 1, 3);
+    make_entity_at(cha_x + 1, cha_y - 1, 3);
+    make_entity_at(cha_x - 1, cha_y + 1, 3);
+    make_entity_at(cha_x, cha_y + 1, 3);
+    make_entity_at(cha_x + 1, cha_y + 1, 3);
+    make_entity_at(cha_x - 1, cha_y, 3);
+    make_entity_at(cha_x + 1, cha_y, 3);
+
     // ADD BOSS ENEMY
     enemy_t boss;
-    boss.init(10, 10, 4, global_uuid_next++);
+    boss.init(rand() % S_WIDTH, rand() % S_HEIGHT, 4, global_uuid_next++);
+    boss._score = 50;
     enemies.push_back(boss);
-    register_object(boss._id, 1 /*entity*/, 0, 0);
+    register_object(boss._id, 1 /*entity*/, 0, 4);
 
     for(int i = 0; i < 10; i++){
         enemy_t e;
-        e.init(rand() % S_WIDTH, rand() % S_HEIGHT, 0, global_uuid_next++);
+        e.init(rand() % S_WIDTH, rand() % S_HEIGHT, rand() % 2 + 2, global_uuid_next++);
+        e._score = 100000;
         enemies.push_back(e);
-        register_object(e._id, 0, i + 1, 0);
+        register_object(e._id, 1, i + 1, e._t);
     }
+
+    return true;
 }
 
 bool player_set_safe(void){
     // go to safe space
-    for (int i = 0; i < entities.size(); i++){
+    for (unsigned int i = 0; i < entities.size(); i++){
         if (abs(entities[i].x - cha_x) <= 3 && abs(entities[i].y < cha_y) <= 3){
             if (entities[i].t == 2) respawn_entity(i);
         }
@@ -220,7 +234,8 @@ bool player_set_safe(void){
 
 void tick_enemy(enemy_t &en, std::vector<entity_t> &e, int cx, int cy){
     if (en._state < 0) return;
-    if (en._score < -20) return;
+    if (en._score < -20 && en._t != 4) return;
+    if (en._score < -50 && en._t == 4) do_win_screen(); // victory
 
     int dx = 0;
     int dy = 0;
@@ -233,20 +248,18 @@ void tick_enemy(enemy_t &en, std::vector<entity_t> &e, int cx, int cy){
         dx = (en._x > cx) ? 1 : ((en._x == cx) ? 0 : -1 );
         dy = (en._y > cy) ? 1 : ((en._y == cy) ? 0 : -1 );
     } else if (en._t == 2) {
+        en._state --;
         if (en._state == 0) {
             en._score += 30;
             damage_object_x(en._x, 30);
             en._state = rand() % 10;
-        } else {
-            en._state--;
         }
     } else if (en._t == 3) {
+        en._state --;
         if (en._state == 0) {
             en._score += 30;
             damage_object_y(en._x, 30);
             en._state = rand() % 10;
-        } else {
-            en._state--;
         }
     } else if (en._t == 4) {
         // BOSS ENEMY
@@ -254,12 +267,35 @@ void tick_enemy(enemy_t &en, std::vector<entity_t> &e, int cx, int cy){
         // killable basically only through grrnades
         // hunts at half speed
         // on death, spawns doors
+
+        if (rand() % 2 == 0){
+            dx = (en._x > cx) ? 1 : ((en._x == cx) ? 0 : -1 );
+            dy = (en._y > cy) ? 1 : ((en._y == cy) ? 0 : -1 );
+
+            dx = -1 * dx;
+            dy = -1 * dy;
+        }
+
+        if (en._state == 0) {
+            en._score += 100;
+            damage_object_x(en._x, 30);
+            damage_object_y(en._y, 30);
+            en._state = 2;
+        } else {
+            en._state--;
+        }
     }
 
     update_object(en._id, dx, dy);
 
     // score check
-    if (en._score < -20) en._state = -1000;
+    if (en._score < -20 && en._t != 4) en._state = -1000;
+    if (en._score < -50 && en._t == 4) do_win_screen();
+
+    if (en._state < 0 && (en._t == 2 || en._t == 3)) {
+        en._score = 10000;
+        en._state = rand() % 10;
+    }
 }
 
 void do_gen_next_level(void){
@@ -308,3 +344,4 @@ void do_gen_next_level(void){
 
     draw();
 }
+

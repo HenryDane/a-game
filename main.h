@@ -29,7 +29,7 @@ struct enemy_t {
         } else {
             _state = 0;
         }
-        _score = 5;
+        _score = 20;
         _id = id;
     }
 };

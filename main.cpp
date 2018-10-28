@@ -58,9 +58,8 @@ int main(){
 
     register_object(global_uuid_next++, 2, 0, 0); // register player
 
-    //generate_pacman();
     generate_terrain();
-    //generate_lasers();
+    generate_lasers();
     //generate_safe_run();
     //generate_boss();
 
@@ -75,7 +74,11 @@ int main(){
 
         if (shield > 0) shield--; // decrease shield
         if (timer_on > 0) timer_on --;
-        if (timer_on == 0) score -= 1000;
+        if (timer_on == 0 && level == 9){
+            do_win_screen();
+        } else if (timer_on == 0 && level != 9) {
+            score -= 1000;
+        }
 
         // control logic
         switch (c){
@@ -130,7 +133,7 @@ int main(){
         // draw screen
         draw();
 
-        for (int i = 0; i < enemies.size(); i++){
+        for (unsigned int i = 0; i < enemies.size(); i++){
             //enemy_t e = enemies[i];
             tick_enemy(enemies[i], entities, cha_x, cha_y);
             //enemies[i] = e;
@@ -202,13 +205,15 @@ void draw(void){
         else if (e._state < 0) set_color(color_t::DEAD);
 
         if (e._t == 2 || e._t == 3) {
-            if (e._state > 0 && e._state < 10){
-                std::cout << e._state;
-            } else {
+            if (e._state < 0){
+                std::cout << "-";
+            } else if (e._state >= 10){
                 std::cout << "*";
+            } else {
+                std::cout << e._state;
             }
         } else if (e._t == 4) {
-            set_color(color_t::R_RED);
+            if (e._state >= 0) set_color(color_t::R_RED);
             std::cout << "O";
         } else {
             std::cout << "O";
@@ -219,7 +224,7 @@ void draw(void){
 
     // score
     jump_xy(0, 0);
-    std::cout << "SCORE:" << score << " SHIELD:" << (shield <= 0) ? 0 : shield;
+    std::cout << "SCORE:" << score << " SHIELD:" << ((shield <= 0) ? 0 : shield);
     if (timer_on < 0) {
         std::cout << " TURNS: infinity";
     } else {
@@ -278,6 +283,11 @@ void do_win_screen() {
     int x = 30;
     int y = 11;
 
+    get_key();
+    draw();
+    get_key();
+    clear_screen();
+
     // print info
     set_color(color_t::GREEN);
         jump_xy(x, y); std::cout << " __   __                   __        __  _           _ " << NL;
@@ -288,6 +298,7 @@ void do_win_screen() {
     set_color(color_t::NORMAL);
     jump_xy(x, y + 6); std::cout << "                   Score: " << score << NL;
 
+    get_key();
     get_key();
 
     exit(0);

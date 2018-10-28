@@ -12,6 +12,7 @@ std::vector<registry_key_t> registry;
 bool init_registry (void){
     registry.clear();
     registry.reserve(200);
+    return true;
 }
 
 bool register_object(int id, int type, int ridx, int rtype){
@@ -21,6 +22,8 @@ bool register_object(int id, int type, int ridx, int rtype){
     rk.ridx = ridx;
     rk.rtype = rtype;
     registry.push_back(rk);
+
+    return true;
 }
 
 bool get_registry_xy(int id, int &x, int &y){
@@ -85,7 +88,7 @@ bool update_object (int id, int dx, int dy){
     }
 
     // wall check
-    for (int i = 0; i < entities.size(); i++){
+    for (unsigned int i = 0; i < entities.size(); i++){
         if (entities[i].x == x && entities[i].y == y && entities[i].t == 4){ // walls
             return false;
         }
@@ -95,7 +98,7 @@ bool update_object (int id, int dx, int dy){
     set_registry_xy(id, x, y);
 
     // interaction check
-    for (int i = 0; i < registry.size(); i++){
+    for (unsigned int i = 0; i < registry.size(); i++){
         if (i == id) continue; // no self-interaction
 
         int x1 = -1; int y1 = -1; get_registry_xy(i, x1, y1); // get xy values of object
@@ -111,7 +114,7 @@ bool update_object (int id, int dx, int dy){
                 respawn_entity(registry[i].ridx);
             } else if (registry[i].type == 1) {
                 if (registry[id].type == 2) score -= 200;
-                if (registry[id].type == 1) enemies[registry[id].ridx]._score -= 200;
+                if (registry[id].type == 1 && registry[id].rtype != 4) enemies[registry[id].ridx]._score -= 200;
             } else if (registry[i].type == 0 && registry[i].rtype == 5) {// exit
                 if (registry[id].type == 2){
                     level++;
@@ -127,17 +130,19 @@ bool update_object (int id, int dx, int dy){
         } else if (abs(x - x1) <= 2 && abs(y - y1) <= 2){ // radius = 2
             if (registry[i].type == 0 && registry[i].rtype == 2){ // bomb
                 if (registry[id].type == 2 && shield == 0) score -= 10;
-                if (registry[id].type == 1) enemies[registry[id].ridx]._score -= 10;
+                if (registry[id].type == 1 && registry[id].rtype != 4) enemies[registry[id].ridx]._score -= 10;
                 draw_explosion(x1, y1, 2);
                 respawn_entity(registry[i].ridx);
                 get_key(); // wait for react
             }
         }
     }
+
+    return true;
 }
 
 bool damage_object_x(int x, int dmg) {
-    for (int i = 0; i < registry.size(); i++){
+    for (unsigned int i = 0; i < registry.size(); i++){
         int x1 = -1;
         int y1 = -1;
         get_registry_xy(i, x1, y1);
@@ -152,6 +157,7 @@ bool damage_object_x(int x, int dmg) {
                 break;
             case 2:
                 score -= 20;
+                break;
             }
         }
     }
@@ -163,10 +169,12 @@ bool damage_object_x(int x, int dmg) {
     }
     set_color(color_t::NORMAL);
     get_key();
+
+    return true;
 }
 
 bool damage_object_y(int y, int dmg) {
-    for (int i = 0; i < registry.size(); i++){
+    for (unsigned int i = 0; i < registry.size(); i++){
         int x1 = -1;
         int y1 = -1;
         get_registry_xy(i, x1, y1);
@@ -181,6 +189,7 @@ bool damage_object_y(int y, int dmg) {
                 break;
             case 2:
                 score -= 20;
+                break;
             }
         }
     }
@@ -192,4 +201,6 @@ bool damage_object_y(int y, int dmg) {
     }
     set_color(color_t::NORMAL);
     get_key();
+
+    return true;
 }
