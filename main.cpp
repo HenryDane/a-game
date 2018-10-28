@@ -11,12 +11,9 @@
 #include "patch.h"
 #include "tex_print.h"
 
-// TODO add levels and level 10 = win
-//``    add selective redraw
-//      add game over screen
+// TODO add selective redraw
 //      add tutorial level
-//      add win screen
-//      add boss enemy
+//      make game victory on final door exit not timer fix
 
 // globals lol
 int cha_x = S_WIDTH / 2;
@@ -38,18 +35,19 @@ int main(){
     srand( time( NULL) );
 
     // print start screen
+    jump_xy(0, 0); std::cout << "Version 0.1.0000";
     set_color(color_t::GREEN);
-    jump_xy(39,9); std::cout << "                                          " << ((char) 10);
-    jump_xy(39,10); std::cout << "   __ _        __ _  __ _ _ __ ___   ___  " << ((char) 10);
-    jump_xy(39,11); std::cout << "  / _` |_____ / _\\`|/ _` | '_ ` _ \\ / _ \\ " << ((char) 10);
-    jump_xy(39,12); std::cout << " | (_| |_____| (_| | (_| | | | | | |  __/ " << ((char) 10);
-    jump_xy(39,13); std::cout << "  \\__,_|      \\__, |\\__,_|_| |_| |_|\\___| " << ((char) 10);
-    jump_xy(39,14); std::cout << "              |___/                       " << ((char) 10);
-    jump_xy(39,15); std::cout << "                                          " << ((char) 10);
+    jump_xy(39, 9); std::cout << "                                          " << ((char) 10);
+    jump_xy(39, 10); std::cout << "   __ _        __ _  __ _ _ __ ___   ___  " << ((char) 10);
+    jump_xy(39, 11); std::cout << "  / _` |_____ / _\\`|/ _` | '_ ` _ \\ / _ \\ " << ((char) 10);
+    jump_xy(39, 12); std::cout << " | (_| |_____| (_| | (_| | | | | | |  __/ " << ((char) 10);
+    jump_xy(39, 13); std::cout << "  \\__,_|      \\__, |\\__,_|_| |_| |_|\\___| " << ((char) 10);
+    jump_xy(39, 14); std::cout << "              |___/                       " << ((char) 10);
+    jump_xy(39, 15); std::cout << "                                          " << ((char) 10);
     set_color(color_t::NORMAL);
-    jump_xy(39,16); std::cout << "              l e v e l   "; set_color(color_t::BRIGHT_RED); std::cout << "# " << level << "             " << ((char) 10);
+    jump_xy(39, 16); std::cout << "              l e v e l   "; set_color(color_t::BRIGHT_RED); std::cout << "# " << level << "             " << ((char) 10);
     set_color(color_t::NORMAL);
-    jump_xy(39,18); std::cout << "       Press any key to begin a game      " << std::endl;
+    jump_xy(39, 18); std::cout << "       Press any key to begin a game      " << std::endl;
 
     // allocate memory in vectors to avoid issues
     init_registry();
@@ -59,9 +57,6 @@ int main(){
     register_object(global_uuid_next++, 2, 0, 0); // register player
 
     generate_terrain();
-    generate_lasers();
-    //generate_safe_run();
-    //generate_boss();
 
     player_set_safe(); // go to safe location
 
@@ -134,9 +129,7 @@ int main(){
         draw();
 
         for (unsigned int i = 0; i < enemies.size(); i++){
-            //enemy_t e = enemies[i];
             tick_enemy(enemies[i], entities, cha_x, cha_y);
-            //enemies[i] = e;
         }
 
         // first 3 turns are immune to score changes
@@ -147,9 +140,8 @@ int main(){
 
         // game over check
         if (score < -20) {
-            //clear_screen();
-            //std::cout << "Game over";
-            //return 0;
+            do_death_screen();
+            return 0;
         }
     }
     return 0;
@@ -276,7 +268,6 @@ void draw_level_screen(int lvl){
     get_key();
 }
 
-
 void do_win_screen() {
     char NL = 10;
 
@@ -305,3 +296,30 @@ void do_win_screen() {
 
 }
 
+void do_death_screen() {
+    char NL = 10;
+
+    int x = 30;
+    int y = 11;
+
+    get_key();
+    draw();
+    get_key();
+    clear_screen();
+
+    // print info
+    set_color(color_t::BRIGHT_RED);
+        jump_xy(x, y); std::cout << "   ____                         ___" << NL;
+    jump_xy(x, y + 1); std::cout << "  / ___| __ _ _ __ ___   ___   / _ \\__   _____ _ __" << NL;
+    jump_xy(x, y + 2); std::cout << " | |  _ / _` | '_ ` _ \\ / _ \\ | | | \\ \\ / / _ \\ '__|" << NL;
+    jump_xy(x, y + 3); std::cout << " | |_| | (_| | | | | | |  __/ | |_| |\\ V /  __/ |" << NL;
+    jump_xy(x, y + 4); std::cout << "  \\____|\\__,_|_| |_| |_|\\___|  \\___/  \\_/ \\___|_|" << NL;
+    set_color(color_t::NORMAL);
+    jump_xy(x, y + 6); std::cout << "                   Score: " << score << NL;
+
+    get_key();
+    get_key();
+
+    exit(0);
+
+}

@@ -54,3 +54,4 @@ void draw(void);
 void draw_explosion(int x, int y, int r);
 void draw_level_screen(int lvl);
 void do_win_screen();
+void do_death_screen();

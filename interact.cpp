@@ -142,6 +142,7 @@ bool update_object (int id, int dx, int dy){
 }
 
 bool damage_object_x(int x, int dmg) {
+    if (x > S_WIDTH) return false;
     for (unsigned int i = 0; i < registry.size(); i++){
         int x1 = -1;
         int y1 = -1;
@@ -174,6 +175,7 @@ bool damage_object_x(int x, int dmg) {
 }
 
 bool damage_object_y(int y, int dmg) {
+    if (y > S_HEIGHT) return false;
     for (unsigned int i = 0; i < registry.size(); i++){
         int x1 = -1;
         int y1 = -1;
