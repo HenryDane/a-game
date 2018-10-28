@@ -12,3 +12,6 @@ bool register_object(int id, int type, int ridx, int rtype);
 bool get_registry_xy(int id, int &x, int &y);
 bool set_registry_xy(int id, int x, int y);
 bool update_object (int id, int dx, int dy);
+
+bool damage_object_x(int x, int dmg);
+bool damage_object_y(int y, int dmg);

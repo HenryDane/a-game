@@ -4,6 +4,8 @@
 #include "interact.h"
 
 bool respawn_entity(int idx){
+    if (entities[idx].t == 5) return false;
+
     if (regen_on){
         // TODO edit registration
         int x = rand() % S_WIDTH;
@@ -48,7 +50,22 @@ bool generate_lasers(void) {
     entities.clear();
     enemies.clear();
 
+    for (int i = 0; i < 60; i++){
+        make_entity_at(rand() % S_WIDTH, rand() % S_HEIGHT, rand() % 4);
+    }
 
+    for (int i = 0; i < 20; i++){
+        enemy_t e;
+        e.init(rand() % S_WIDTH, rand() % S_HEIGHT, rand() % 2 + 2, global_uuid_next++);
+        enemies.push_back(e);
+        //register_object(global_uuid_next++, 1, enemies)
+        register_object(e._id, 1 /*entity*/, i, 0);
+    }
+
+    make_entity_at(0, 0, 5);
+    make_entity_at(S_WIDTH, 0, 5);
+    make_entity_at(S_WIDTH, S_HEIGHT, 5);
+    make_entity_at(0, S_HEIGHT, 5);
 
     return true;
 }
@@ -87,6 +104,8 @@ bool generate_pacman(void) {
 }
 
 bool generate_terrain( void ){
+    regen_on = true;
+    timer_on = -10;
     cha_x = S_WIDTH / 2;
     cha_y = S_HEIGHT / 2;
     entities.clear();
@@ -147,14 +166,56 @@ bool generate_terrain( void ){
     return true;
 }
 
+bool generate_safe_run(void) {
+    generate_terrain();
+
+    regen_on = true;
+    timer_on = 25;
+
+    for (int i = 0; i < 60; i++){
+        make_entity_at(rand() % S_WIDTH, rand() % S_HEIGHT, 6);
+    }
+
+    return true;
+}
+
+bool generate_boss(void){
+    cha_x = S_WIDTH / 2;
+    cha_y = S_HEIGHT / 2;
+    entities.clear();
+    enemies.clear();
+
+    regen_on = false;
+    timer_on = -10;
+
+    for (int i = 0; i < 50; i++){
+        make_entity_at(rand() % S_WIDTH, rand() % S_HEIGHT, 3);
+        make_entity_at(rand() % S_WIDTH, rand() % S_HEIGHT, 2);
+    }
+
+    // ADD BOSS ENEMY
+    enemy_t boss;
+    boss.init(10, 10, 4, global_uuid_next++);
+    enemies.push_back(boss);
+    register_object(boss._id, 1 /*entity*/, 0, 0);
+
+    for(int i = 0; i < 10; i++){
+        enemy_t e;
+        e.init(rand() % S_WIDTH, rand() % S_HEIGHT, 0, global_uuid_next++);
+        enemies.push_back(e);
+        register_object(e._id, 0, i + 1, 0);
+    }
+}
+
 bool player_set_safe(void){
     // go to safe space
     for (int i = 0; i < entities.size(); i++){
-        if (abs(entities[i].x - cha_x) <= 3 || abs(entities[i].y < cha_y) <= 3){
+        if (abs(entities[i].x - cha_x) <= 3 && abs(entities[i].y < cha_y) <= 3){
             if (entities[i].t == 2) respawn_entity(i);
         }
     }
 
+    return true;
 }
 
 void tick_enemy(enemy_t &en, std::vector<entity_t> &e, int cx, int cy){
@@ -164,14 +225,35 @@ void tick_enemy(enemy_t &en, std::vector<entity_t> &e, int cx, int cy){
     int dx = 0;
     int dy = 0;
 
-    if (en._t == 0){
-        // randomwalks
+    if (en._t == 0) { // randomwalks
         dx = rand() % 3 - 1;
         dy = rand() % 3 - 1;
-    } else if (en._t == 1){ // hunter
+    } else if (en._t == 1) { // hunter
         // TODO obj avoid
         dx = (en._x > cx) ? 1 : ((en._x == cx) ? 0 : -1 );
         dy = (en._y > cy) ? 1 : ((en._y == cy) ? 0 : -1 );
+    } else if (en._t == 2) {
+        if (en._state == 0) {
+            en._score += 30;
+            damage_object_x(en._x, 30);
+            en._state = rand() % 10;
+        } else {
+            en._state--;
+        }
+    } else if (en._t == 3) {
+        if (en._state == 0) {
+            en._score += 30;
+            damage_object_y(en._x, 30);
+            en._state = rand() % 10;
+        } else {
+            en._state--;
+        }
+    } else if (en._t == 4) {
+        // BOSS ENEMY
+        // hunts, lasers every other turn
+        // killable basically only through grrnades
+        // hunts at half speed
+        // on death, spawns doors
     }
 
     update_object(en._id, dx, dy);
@@ -187,14 +269,6 @@ void do_gen_next_level(void){
     global_score += score;
     score = 0;
 
-    // print start screen
-    clear_screen();
-    set_color(color_t::NORMAL);
-    jump_xy(39,16); std::cout << "              l e v e l   "; set_color(color_t::DARK_RED); std::cout << "# " << level << "             " << ((char) 10);
-    set_color(color_t::NORMAL);
-    jump_xy(39,18); std::cout << "         Welcome to the next level!      " << std::endl;
-    jump_xy(39,18); std::cout << "       Press any key to begin a game      " << std::endl;
-
     register_object(global_uuid_next++, 2, 0, 0);
 
     switch(level){
@@ -205,6 +279,21 @@ void do_gen_next_level(void){
     case 2:
         generate_pacman();
         break;
+    case 3:
+    case 4:
+        generate_lasers();
+        break;
+    case 5:
+        generate_safe_run();
+        break;
+    case 6:
+    case 7:
+    case 8:
+        generate_terrain();
+        break;
+    case 9:
+        generate_boss();
+        break;
     default:
         generate_empty();
         break;
@@ -213,6 +302,9 @@ void do_gen_next_level(void){
     cha_x = S_WIDTH / 2;
     cha_y = S_HEIGHT / 2;
     player_set_safe(); // go to safe location
+
+    clear_screen();
+    draw_level_screen(level);
 
     draw();
 }

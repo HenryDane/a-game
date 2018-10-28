@@ -8,12 +8,15 @@
 #include "console.h"
 #include "game.h"
 #include "interact.h"
+#include "patch.h"
+#include "tex_print.h"
 
 // TODO add levels and level 10 = win
-//      add turn counter flag
-//      add laser entities
-//      add timeplus entities
-//      add make lasers collide with walls
+//``    add selective redraw
+//      add game over screen
+//      add tutorial level
+//      add win screen
+//      add boss enemy
 
 // globals lol
 int cha_x = S_WIDTH / 2;
@@ -23,7 +26,10 @@ int shield = -1002; // signals first turn
 std::vector<entity_t> entities;
 std::vector<enemy_t> enemies;
 int global_uuid_next = 0;
+
 bool regen_on = true;
+int timer_on = -1;
+
 int global_score = 0;
 int level = 0;
 
@@ -41,7 +47,7 @@ int main(){
     jump_xy(39,14); std::cout << "              |___/                       " << ((char) 10);
     jump_xy(39,15); std::cout << "                                          " << ((char) 10);
     set_color(color_t::NORMAL);
-    jump_xy(39,16); std::cout << "              l e v e l   "; set_color(color_t::DARK_RED); std::cout << "# " << level << "             " << ((char) 10);
+    jump_xy(39,16); std::cout << "              l e v e l   "; set_color(color_t::BRIGHT_RED); std::cout << "# " << level << "             " << ((char) 10);
     set_color(color_t::NORMAL);
     jump_xy(39,18); std::cout << "       Press any key to begin a game      " << std::endl;
 
@@ -54,13 +60,22 @@ int main(){
 
     //generate_pacman();
     generate_terrain();
+    //generate_lasers();
+    //generate_safe_run();
+    //generate_boss();
 
     player_set_safe(); // go to safe location
+
+    get_key();
+    clear_screen();
+    draw_level_screen(0);
 
     while (true) {
         char c = get_key(); // get input
 
         if (shield > 0) shield--; // decrease shield
+        if (timer_on > 0) timer_on --;
+        if (timer_on == 0) score -= 1000;
 
         // control logic
         switch (c){
@@ -77,13 +92,19 @@ int main(){
             update_object(0, -1, 0);
             break;
         case 'q':
-            if (score > 10) { // activates ten turn shield for a score cost of 5
+            if (score > 10 &&
+                level != 6 &&
+                level != 7 &&
+                level != 8) { // activates ten turn shield for a score cost of 5
                 shield = 10;
                 score -= 5;
             }
             break;
         case 'e': // uses a grenade with a cost of 5
-            if (score > 10) {
+            if (score > 10 &&
+                level != 6 &&
+                level != 7 &&
+                level != 8) {
                 score -= 5;
                 draw_explosion(cha_x, cha_y, 2);
                 get_key();
@@ -99,6 +120,8 @@ int main(){
             break;
         case 'l': score += 10; break;
         case ';': generate_terrain(); break;
+        case 'n': damage_object_x(cha_x, 0); break;
+        case 'm': damage_object_y(cha_y, 0); break;
         default:
             update_object(0, 0, 0);
             break;
@@ -165,6 +188,8 @@ void draw(void){
             std::cout << "D";
             set_color(color_t::NORMAL);
             break;
+        case 6:
+            std::cout << "T"; break;
         default:
             break;
         }
@@ -175,14 +200,31 @@ void draw(void){
         jump_xy(e._x, e._y + 2);
         if (e._state >= 0) set_color(color_t::LT_BLUE);
         else if (e._state < 0) set_color(color_t::DEAD);
-        std::cout << "O";
+
+        if (e._t == 2 || e._t == 3) {
+            if (e._state > 0 && e._state < 10){
+                std::cout << e._state;
+            } else {
+                std::cout << "*";
+            }
+        } else if (e._t == 4) {
+            set_color(color_t::R_RED);
+            std::cout << "O";
+        } else {
+            std::cout << "O";
+        }
+
         set_color(color_t::NORMAL);
     }
 
     // score
     jump_xy(0, 0);
     std::cout << "SCORE:" << score << " SHIELD:" << (shield <= 0) ? 0 : shield;
-    std::cout << " LEVEL:" << level << " G_UUID_N:" << global_uuid_next << " R_SIZE:" << registry.size();
+    if (timer_on < 0) {
+        std::cout << " TURNS: infinity";
+    } else {
+        std::cout << " TURNS:" << timer_on;
+    }
 
     // debug
     jump_xy(10, 0);
@@ -207,3 +249,48 @@ void draw_explosion(int x, int y, int r){
     }
     set_color(color_t::NORMAL);
 }
+
+void draw_level_screen(int lvl){
+    print_lvl_lbl(30,11);
+    set_color(color_t::GREEN);
+    switch(lvl){
+        case 0: print_00(68,11); break;
+        case 1: print_01(68,11); break;
+        case 2: print_02(68,11); break;
+        case 3: print_03(68,11); break;
+        case 4: print_04(68,11); break;
+        case 5: print_05(68,11); break;
+        case 6: print_06(68,11); break;
+        case 7: print_07(68,11); break;
+        case 8: print_08(68,11); break;
+        case 9: print_09(68,11); break;
+        case 10: print_10(68,11); break;
+    }
+    set_color(color_t::NORMAL);
+    jump_xy(47, 19); std::cout << "Press any key to begin";
+    get_key();
+}
+
+
+void do_win_screen() {
+    char NL = 10;
+
+    int x = 30;
+    int y = 11;
+
+    // print info
+    set_color(color_t::GREEN);
+        jump_xy(x, y); std::cout << " __   __                   __        __  _           _ " << NL;
+    jump_xy(x, y + 1); std::cout << " \\ \\ / /   ___    _   _    \\ \\      / / (_)  _ __   | |" << NL;
+    jump_xy(x, y + 2); std::cout << "  \\ V /   / _ \\  | | | |    \\ \\ /\\ / /  | | | '_ \\  | |" << NL;
+    jump_xy(x, y + 3); std::cout << "   | |   | (_) | | |_| |     \\ V  V /   | | | | | | |_|" << NL;
+    jump_xy(x, y + 4); std::cout << "   |_|    \\___/   \\__,_|      \\_/\\_/    |_| |_| |_| (_)" << NL;
+    set_color(color_t::NORMAL);
+    jump_xy(x, y + 6); std::cout << "                   Score: " << score << NL;
+
+    get_key();
+
+    exit(0);
+
+}
+

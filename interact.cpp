@@ -113,11 +113,16 @@ bool update_object (int id, int dx, int dy){
                 if (registry[id].type == 2) score -= 200;
                 if (registry[id].type == 1) enemies[registry[id].ridx]._score -= 200;
             } else if (registry[i].type == 0 && registry[i].rtype == 5) {// exit
-                level++;
-                cha_x = S_WIDTH / 2;
-                cha_y = S_HEIGHT / 2;
-                do_gen_next_level();
-                return true;
+                if (registry[id].type == 2){
+                    level++;
+                    cha_x = S_WIDTH / 2;
+                    cha_y = S_HEIGHT / 2;
+                    do_gen_next_level();
+                    return true;
+                }
+            } else if (registry[i].type == 0 && registry[i].rtype == 6) {
+                if (registry[id].type == 2) timer_on += 7;
+                respawn_entity(registry[i].ridx);
             }
         } else if (abs(x - x1) <= 2 && abs(y - y1) <= 2){ // radius = 2
             if (registry[i].type == 0 && registry[i].rtype == 2){ // bomb
@@ -129,4 +134,62 @@ bool update_object (int id, int dx, int dy){
             }
         }
     }
+}
+
+bool damage_object_x(int x, int dmg) {
+    for (int i = 0; i < registry.size(); i++){
+        int x1 = -1;
+        int y1 = -1;
+        get_registry_xy(i, x1, y1);
+
+        if (x == x1){
+            switch (registry[i].type){
+            case 0:
+                respawn_entity(registry[i].ridx);
+                break;
+            case 1:
+                // do not damage other entities;
+                break;
+            case 2:
+                score -= 20;
+            }
+        }
+    }
+
+    set_color(color_t::BRIGHT_RED);
+    for (int i = 0; i <= S_HEIGHT; i++){
+        jump_xy(x, i + 2);
+        std::cout << "#";
+    }
+    set_color(color_t::NORMAL);
+    get_key();
+}
+
+bool damage_object_y(int y, int dmg) {
+    for (int i = 0; i < registry.size(); i++){
+        int x1 = -1;
+        int y1 = -1;
+        get_registry_xy(i, x1, y1);
+
+        if (y == y1){
+            switch (registry[i].type){
+            case 0:
+                respawn_entity(registry[i].ridx);
+                break;
+            case 1:
+                // do not damage other entities;
+                break;
+            case 2:
+                score -= 20;
+            }
+        }
+    }
+
+    set_color(color_t::BRIGHT_RED);
+    for (int i = 0; i <= S_WIDTH; i++){
+        jump_xy(i, y + 2);
+        std::cout << "#";
+    }
+    set_color(color_t::NORMAL);
+    get_key();
 }
