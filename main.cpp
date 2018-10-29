@@ -30,13 +30,15 @@ int global_score = 0;
 int level = 0;
 
 bool dots_on = false; // flag for dots display
+bool entity_spawn_lock = false; // flag for deleting everything nearby
+bool entity_overlap_check_on = false;
 
 int main(){
     // configure random
     srand( time( NULL) );
 
     // print start screen
-    jump_xy(0, 0); std::cout << "Version 0.1.0007";
+    jump_xy(0, 0); std::cout << "Version 0.1.0014";
     set_color(color_t::GREEN);
     jump_xy(39, 9); std::cout << "                                          " << ((char) 10);
     jump_xy(39, 10); std::cout << "   __ _        __ _  __ _ _ __ ___   ___  " << ((char) 10);
@@ -58,6 +60,9 @@ int main(){
     register_object(global_uuid_next++, 2, 0, 0); // register player
 
     generate_tutorial();
+    //level = 7;
+    //generate_lasers();
+    //generate_dense_terrain();
 
     player_set_safe(); // go to safe location
 
@@ -84,10 +89,12 @@ int main(){
             continue;
             break;
         case 't': // tutorial skip
-            if (level == 0){
+            if (level == 0){ // should be level == 0
                 level++;
+                timer_on = -1;
                 cha_x = S_WIDTH / 2;
                 cha_y = S_HEIGHT / 2;
+
                 do_gen_next_level();
                 continue;
             }
@@ -286,8 +293,18 @@ void draw_level_screen(int lvl){
         case 10: print_10(68,11); break;
     }
     set_color(color_t::NORMAL);
-    jump_xy(47, 19); std::cout << "Press any key to begin";
-    //get_key();
+    jump_xy(49, 19); std::cout << "Press space to begin";
+
+    if (lvl == 7 ||
+        lvl == 8 ||
+        lvl == 9) {
+        set_color(color_t::BRIGHT_RED);
+        jump_xy(37,21);
+        std::cout << "Warning: Bombs and grenades do not work here";
+    }
+
+    while (get_key() != ' ');
+
 }
 
 void do_win_screen() {
@@ -309,7 +326,7 @@ void do_win_screen() {
     jump_xy(x, y + 3); std::cout << "   | |   | (_) | | |_| |     \\ V  V /   | | | | | | |_|" << NL;
     jump_xy(x, y + 4); std::cout << "   |_|    \\___/   \\__,_|      \\_/\\_/    |_| |_| |_| (_)" << NL;
     set_color(color_t::NORMAL);
-    jump_xy(x, y + 6); std::cout << "                   Score: " << score << NL;
+    jump_xy(x, y + 6); std::cout << "                   Score: " << global_score << NL;
 
     get_key();
     get_key();
@@ -337,7 +354,7 @@ void do_death_screen() {
     jump_xy(x, y + 3); std::cout << " | |_| | (_| | | | | | |  __/ | |_| |\\ V /  __/ |" << NL;
     jump_xy(x, y + 4); std::cout << "  \\____|\\__,_|_| |_| |_|\\___|  \\___/  \\_/ \\___|_|" << NL;
     set_color(color_t::NORMAL);
-    jump_xy(x, y + 6); std::cout << "                   Score: " << score << NL;
+    jump_xy(x, y + 6); std::cout << "                   Score: " << global_score << NL;
 
     get_key();
 

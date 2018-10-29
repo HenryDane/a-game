@@ -118,6 +118,7 @@ bool update_object (int id, int dx, int dy){
             } else if (registry[i].type == 0 && registry[i].rtype == 5) {// exit
                 if (registry[id].type == 2){
                     level++;
+                    timer_on = -1;
                     cha_x = S_WIDTH / 2;
                     cha_y = S_HEIGHT / 2;
                     do_gen_next_level();
@@ -142,7 +143,7 @@ bool update_object (int id, int dx, int dy){
 }
 
 bool damage_object_x(int x, int dmg) {
-    if (x > S_WIDTH) return false;
+    //if (x > S_WIDTH) return false;
     for (unsigned int i = 0; i < registry.size(); i++){
         int x1 = -1;
         int y1 = -1;
@@ -151,7 +152,7 @@ bool damage_object_x(int x, int dmg) {
         if (x == x1){
             switch (registry[i].type){
             case 0:
-                respawn_entity(registry[i].ridx);
+                if (registry[i].rtype != 4) respawn_entity(registry[i].ridx);
                 break;
             case 1:
                 // do not damage other entities;
@@ -175,7 +176,7 @@ bool damage_object_x(int x, int dmg) {
 }
 
 bool damage_object_y(int y, int dmg) {
-    if (y > S_HEIGHT) return false;
+    //if (y >= S_HEIGHT) return false;
     for (unsigned int i = 0; i < registry.size(); i++){
         int x1 = -1;
         int y1 = -1;
@@ -184,7 +185,7 @@ bool damage_object_y(int y, int dmg) {
         if (y == y1){
             switch (registry[i].type){
             case 0:
-                respawn_entity(registry[i].ridx);
+                if (registry[i].rtype != 4) respawn_entity(registry[i].ridx);
                 break;
             case 1:
                 // do not damage other entities;

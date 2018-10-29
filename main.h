@@ -48,6 +48,8 @@ extern int global_uuid_next;
 
 extern bool regen_on;
 extern int timer_on;
+extern bool entity_spawn_lock;
+extern bool entity_overlap_check_on;
 
 // prototypes
 void draw(void);

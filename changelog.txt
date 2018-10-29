@@ -1,4 +1,17 @@
-v0.1.next
+v0.1.0014
+- made level next key be space
+- fixed spawn on pacman lvl
+- swapped pacman and saferun levels
+- added warnings on lvls 7, 8, 9
+- reworked levels 7, 8, 9
+- fixed level bugs
+
+v0.1.todo
+- add restart level option
+- add puzzle levels
+- make items from tutorial actual items
+
+v0.1.0008
 - made grid optional
 - put text under character
 - removed debug stuff
