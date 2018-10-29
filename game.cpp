@@ -417,7 +417,11 @@ void tick_enemy(enemy_t &en, std::vector<entity_t> &e, int cx, int cy){
 
     // score check
     if (en._score < -20 && en._t != 4) en._state = -1000;
-    if (en._score < -50 && en._t == 4) do_win_screen();
+    if (en._score < -50 && en._t == 4) {
+        // spawn the door
+        make_entity_at(S_WIDTH / 2, S_HEIGHT / 2, 100);
+        en._state = -1000;
+    }
 
     if (en._state < 0 && (en._t == 2 || en._t == 3)) {
         en._score = 10000;

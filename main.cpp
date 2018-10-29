@@ -60,9 +60,6 @@ int main(){
     register_object(global_uuid_next++, 2, 0, 0); // register player
 
     generate_tutorial();
-    //level = 7;
-    //generate_lasers();
-    //generate_dense_terrain();
 
     player_set_safe(); // go to safe location
 
@@ -76,7 +73,8 @@ int main(){
         if (shield > 0) shield--; // decrease shield
         if (timer_on > 0) timer_on --;
         if (timer_on == 0 && level == 10){
-            do_win_screen();
+            //do_win_screen();
+            make_entity_at(S_WIDTH / 2, S_HEIGHT / 2, 100);
         } else if (timer_on == 0 && level != 10) {
             score -= 1000;
         }
@@ -206,6 +204,7 @@ void draw(void){
             break;
         case 4:
             std::cout << "#"; break;
+        case 100:
         case 5:
             set_color(color_t::GR_GREEN);
             std::cout << "D";

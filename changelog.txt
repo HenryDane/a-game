@@ -5,11 +5,11 @@ v0.1.0014
 - added warnings on lvls 7, 8, 9
 - reworked levels 7, 8, 9
 - fixed level bugs
+- make boss death trigger door spawn
 
 v0.1.todo
 - add restart level option
 - add puzzle levels
-- make items from tutorial actual items
 
 v0.1.0008
 - made grid optional

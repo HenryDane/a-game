@@ -127,6 +127,8 @@ bool update_object (int id, int dx, int dy){
             } else if (registry[i].type == 0 && registry[i].rtype == 6) {
                 if (registry[id].type == 2) timer_on += 7;
                 respawn_entity(registry[i].ridx);
+            } else if (registry[i].type == 0 && registry[i].rtype == 100) {
+                do_win_screen();
             }
         } else if (abs(x - x1) <= 2 && abs(y - y1) <= 2){ // radius = 2
             if (registry[i].type == 0 && registry[i].rtype == 2){ // bomb
