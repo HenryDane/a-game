@@ -10,6 +10,9 @@ v0.1.0014
 v0.1.todo
 - add restart level option
 - add puzzle levels
+- redraw w/o explosions after death for aesthetics
+- add level explanations 
+- selective redraw
 
 v0.1.0008
 - made grid optional

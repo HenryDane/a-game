@@ -1,5 +1,6 @@
 #include <vector>
 #include <stdlib.h>
+#include <SFML/Graphics.hpp>
 
 #define S_WIDTH 100
 #define S_HEIGHT 25
@@ -58,3 +59,5 @@ void draw_level_screen(int lvl);
 void do_win_screen();
 void do_death_screen();
 void draw_level_text();
+
+extern sf::RenderTexture renderTexture;

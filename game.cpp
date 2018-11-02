@@ -86,6 +86,8 @@ bool generate_tutorial(void){
     register_object(enemy._id, 1, 0, -1);
 
     make_entity_at(80, S_HEIGHT / 2, 5);
+
+    return true;
 }
 
 bool generate_lasers(void) {

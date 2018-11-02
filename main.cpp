@@ -1,3 +1,4 @@
+#include <SFML/Graphics.hpp>
 #include <iostream>
 #include <vector>
 #include <string>
@@ -11,46 +12,42 @@
 #include "patch.h"
 #include "tex_print.h"
 
-// TODO add selective redraw
-//      make game victory on final door exit not timer fix
-
 // globals lol
 int cha_x = S_WIDTH / 2;
 int cha_y = S_HEIGHT / 2;
 int score = 5;
+int global_score = 0;
+int level = 0;
 int shield = -1002; // signals first turn
 std::vector<entity_t> entities;
 std::vector<enemy_t> enemies;
 int global_uuid_next = 0;
 
-bool regen_on = true;
-int timer_on = -1;
-
-int global_score = 0;
-int level = 0;
-
+// flags
+bool regen_on = true; // do entities regen?
+int timer_on = -1; // if >= 0 timer is on
 bool dots_on = false; // flag for dots display
 bool entity_spawn_lock = false; // flag for deleting everything nearby
-bool entity_overlap_check_on = false;
+bool entity_overlap_check_on = false; // prevent overlap spawn
+
+//gfx shenanigans
+sf::RenderTexture renderTexture;
 
 int main(){
+    sf::RenderWindow window(sf::VideoMode(200, 200), "SFML works!");
+
+    while ()
+    {
+
+
+
+    }
+
     // configure random
     srand( time( NULL) );
 
     // print start screen
-    jump_xy(0, 0); std::cout << "Version 0.1.0014";
-    set_color(color_t::GREEN);
-    jump_xy(39, 9); std::cout << "                                          " << ((char) 10);
-    jump_xy(39, 10); std::cout << "   __ _        __ _  __ _ _ __ ___   ___  " << ((char) 10);
-    jump_xy(39, 11); std::cout << "  / _` |_____ / _\\`|/ _` | '_ ` _ \\ / _ \\ " << ((char) 10);
-    jump_xy(39, 12); std::cout << " | (_| |_____| (_| | (_| | | | | | |  __/ " << ((char) 10);
-    jump_xy(39, 13); std::cout << "  \\__,_|      \\__, |\\__,_|_| |_| |_|\\___| " << ((char) 10);
-    jump_xy(39, 14); std::cout << "              |___/                       " << ((char) 10);
-    jump_xy(39, 15); std::cout << "                                          " << ((char) 10);
-    set_color(color_t::NORMAL);
-    jump_xy(39, 16); std::cout << "              l e v e l   "; set_color(color_t::BRIGHT_RED); std::cout << "# " << level << "             " << ((char) 10);
-    set_color(color_t::NORMAL);
-    jump_xy(39, 18); std::cout << "       Press any key to begin a game      " << std::endl;
+    draw_title();
 
     // allocate memory in vectors to avoid issues
     init_registry();
@@ -67,7 +64,14 @@ int main(){
     clear_screen();
     draw_level_screen(0);
 
-    while (true) {
+    while (window.isOpen()) {
+        sf::Event event;
+        while (window.pollEvent(event))
+        {
+            if (event.type == sf::Event::Closed)
+                window.close();
+        }
+
         char c = get_key(); // get input
 
         if (shield > 0) shield--; // decrease shield
@@ -136,21 +140,24 @@ int main(){
                 }
             }
             break;
-        //case 'l': score += 10; break;
-        //case ';': generate_terrain(); break;
-        //case 'n': damage_object_x(cha_x, 0); break;
-        //case 'm': damage_object_y(cha_y, 0); break;
         default:
             update_object(0, 0, 0);
             break;
         }
 
-        // draw screen
-        draw();
-
         for (unsigned int i = 0; i < enemies.size(); i++){
             tick_enemy(enemies[i], entities, cha_x, cha_y);
         }
+
+        const sf::Texture& texture = renderTexture.getTexture();
+        sf::Sprite sprite(texture);
+        window.draw(sprite);
+        window.clear();
+        window.draw(shape);
+        window.display();
+
+        // draw screen
+        draw();
 
         // first 3 turns are immune to score changes
         if (shield <= -1000){
@@ -273,6 +280,22 @@ void draw_explosion(int x, int y, int r){
         }
     }
     set_color(color_t::NORMAL);
+}
+
+void draw_title(void){
+    jump_xy(0, 0); std::cout << "Version 0.1.0015-g";
+    set_color(color_t::GREEN);
+    jump_xy(39, 9); std::cout << "                                          " << ((char) 10);
+    jump_xy(39, 10); std::cout << "   __ _        __ _  __ _ _ __ ___   ___  " << ((char) 10);
+    jump_xy(39, 11); std::cout << "  / _` |_____ / _\\`|/ _` | '_ ` _ \\ / _ \\ " << ((char) 10);
+    jump_xy(39, 12); std::cout << " | (_| |_____| (_| | (_| | | | | | |  __/ " << ((char) 10);
+    jump_xy(39, 13); std::cout << "  \\__,_|      \\__, |\\__,_|_| |_| |_|\\___| " << ((char) 10);
+    jump_xy(39, 14); std::cout << "              |___/                       " << ((char) 10);
+    jump_xy(39, 15); std::cout << "                                          " << ((char) 10);
+    set_color(color_t::NORMAL);
+    jump_xy(39, 16); std::cout << "              l e v e l   "; set_color(color_t::BRIGHT_RED); std::cout << "# " << level << "             " << ((char) 10);
+    set_color(color_t::NORMAL);
+    jump_xy(39, 18); std::cout << "       Press any key to begin a game      " << std::endl;
 }
 
 void draw_level_screen(int lvl){
