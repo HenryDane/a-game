@@ -1,3 +1,12 @@
+v0.1.0016
+- clear screen on startup
+- ANSI color and console handling so compiles for other platforms
+
+v0.1.todo
+- add restart level option
+- add puzzle levels
+- sometimes enemies and lasers get mixed up. 
+
 v0.1.0014
 - made level next key be space
 - fixed spawn on pacman lvl
@@ -6,10 +15,6 @@ v0.1.0014
 - reworked levels 7, 8, 9
 - fixed level bugs
 - make boss death trigger door spawn
-
-v0.1.todo
-- add restart level option
-- add puzzle levels
 
 v0.1.0008
 - made grid optional

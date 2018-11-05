@@ -12,7 +12,6 @@
 #include "tex_print.h"
 
 // TODO add selective redraw
-//      make game victory on final door exit not timer fix
 
 // globals lol
 int cha_x = S_WIDTH / 2;
@@ -37,8 +36,12 @@ int main(){
     // configure random
     srand( time( NULL) );
 
+    // turn on ANSI escape sequences
+    init_console_win();
+
     // print start screen
-    jump_xy(0, 0); std::cout << "Version 0.1.0014";
+    clear_screen();
+    jump_xy(0, 0); std::cout << "Version 0.1.0016";
     set_color(color_t::GREEN);
     jump_xy(39, 9); std::cout << "                                          " << ((char) 10);
     jump_xy(39, 10); std::cout << "   __ _        __ _  __ _ _ __ ___   ___  " << ((char) 10);
@@ -184,6 +187,30 @@ void draw(void){
     if (shield > 0) std::cout << "@";
     set_color(color_t::NORMAL);
 
+    // enemies
+    for (enemy_t e : enemies){
+        jump_xy(e._x, e._y + 2);
+        if (e._state >= 0) set_color(color_t::LT_BLUE);
+        else if (e._state < 0) set_color(color_t::DEAD);
+
+        if (e._t == 2 || e._t == 3) {
+            if (e._state < 0){
+                std::cout << "-";
+            } else if (e._state >= 10){
+                std::cout << "*";
+            } else {
+                std::cout << e._state;
+            }
+        } else if (e._t == 4) {
+            if (e._state >= 0) set_color(color_t::R_RED);
+            std::cout << "O";
+        } else {
+            std::cout << "O";
+        }
+
+        set_color(color_t::NORMAL);
+    }
+
     // entities
     for (entity_t e : entities){
         if (e.t < 0) continue;
@@ -215,30 +242,6 @@ void draw(void){
         default:
             break;
         }
-    }
-
-    // enemies
-    for (enemy_t e : enemies){
-        jump_xy(e._x, e._y + 2);
-        if (e._state >= 0) set_color(color_t::LT_BLUE);
-        else if (e._state < 0) set_color(color_t::DEAD);
-
-        if (e._t == 2 || e._t == 3) {
-            if (e._state < 0){
-                std::cout << "-";
-            } else if (e._state >= 10){
-                std::cout << "*";
-            } else {
-                std::cout << e._state;
-            }
-        } else if (e._t == 4) {
-            if (e._state >= 0) set_color(color_t::R_RED);
-            std::cout << "O";
-        } else {
-            std::cout << "O";
-        }
-
-        set_color(color_t::NORMAL);
     }
 
     // score

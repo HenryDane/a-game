@@ -3,9 +3,40 @@
 #include "windows.h"
 #include "console.h"
 
+#ifndef ENABLE_VIRTUAL_TERMINAL_PROCESSING
+#define ENABLE_VIRTUAL_TERMINAL_PROCESSING 0x0004
+#endif
+
 bool set_color(color_t c){
-    HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
-    SetConsoleTextAttribute(hConsole, c);
+    /*HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
+    SetConsoleTextAttribute(hConsole, c);*/
+    int f, b = 0;
+
+    switch (c){
+    case NORMAL:
+        f = 15; b = 0; break;
+    case DARK_RED:
+        f = 1; b = 0; break;
+    case BRIGHT_RED:
+        f = 9; b = 0; break;
+    case GREEN:
+        f = 10; b = 0; break;
+    case LT_BLUE:
+        f = 14; b = 0; break;
+    case DEAD:
+        f = 8; b = 4; break;
+    case YELLOW:
+        f = 11; b = 0; break;
+    case GR_GREEN:
+        f = 0; b = 10; break;
+    case R_RED:
+        f = 0; b = 9; break;
+    default:
+        f = 9; b = 9; break;
+    }
+
+    std::cout << "\033[38;5;" << f << "m";
+    std::cout << "\033[48;5;" << b << "m";
     return true;
 }
 
@@ -14,14 +45,18 @@ bool jump_xy(int x, int y) {
     if (y < 0) y = 0;
     if (x > S_WIDTH) x = S_WIDTH;
     if (y > S_HEIGHT + 4) y = S_HEIGHT + 4;
-    COORD p = { x, y };
-    SetConsoleCursorPosition( GetStdHandle( STD_OUTPUT_HANDLE ), p );
+    /*COORD p = { x, y };
+    SetConsoleCursorPosition( GetStdHandle( STD_OUTPUT_HANDLE ), p );*/
+    jump_xync(x, y);
     return true;
 }
 
 bool jump_xync(int x, int y) {
-    COORD p = { x, y };
-    SetConsoleCursorPosition( GetStdHandle( STD_OUTPUT_HANDLE ), p );
+    /*COORD p = { x, y };
+    SetConsoleCursorPosition( GetStdHandle( STD_OUTPUT_HANDLE ), p );*/
+
+    // i dont know why its (y + 1) but dont change it please
+    std::cout << "\033[" << y + 1 << ";" << x << "H";
     return true;
 }
 
@@ -36,7 +71,8 @@ bool paint_grid() {
 }
 
 bool clear_screen() {
-    char fill = ' ';
+    std::cout << "\033[2J";
+    /*char fill = ' ';
     COORD tl = {0,0};
     CONSOLE_SCREEN_BUFFER_INFO s;
     HANDLE console = GetStdHandle(STD_OUTPUT_HANDLE);
@@ -44,7 +80,7 @@ bool clear_screen() {
     DWORD written, cells = s.dwSize.X * s.dwSize.Y;
     FillConsoleOutputCharacter(console, fill, cells, tl, &written);
     FillConsoleOutputAttribute(console, s.wAttributes, cells, tl, &written);
-    SetConsoleCursorPosition(console, tl);
+    SetConsoleCursorPosition(console, tl);*/
     return true;
 }
 
@@ -54,6 +90,15 @@ bool print_nchr(int n, char c){
     return true;
 }
 
+bool print_nchrv(int n, int x, char c){
+    for (int i = 0; i < n; i++){
+        jump_xy(x, i);
+        std::cout << c;
+    }
+    return true;
+}
+
+// windows only
 char get_key(void) {
     DWORD mode, cc;
     HANDLE h = GetStdHandle( STD_INPUT_HANDLE );
@@ -70,7 +115,30 @@ char get_key(void) {
     return c;
 }
 
-void do_msg(std::string msg){
-    MessageBox(0, msg.c_str(), "Note: ", MB_OK);
-}
+bool init_console_win(void){
+#ifdef _WIN32
+    // Set output mode to handle virtual terminal sequences
+    HANDLE hOut = GetStdHandle(STD_OUTPUT_HANDLE);
+    if (hOut == INVALID_HANDLE_VALUE)
+    {
+        //return GetLastError();
+        return false;
+    }
 
+    DWORD dwMode = 0;
+    if (!GetConsoleMode(hOut, &dwMode))
+    {
+        //return GetLastError();
+        return false;
+    }
+
+    dwMode |= ENABLE_VIRTUAL_TERMINAL_PROCESSING;
+    if (!SetConsoleMode(hOut, dwMode))
+    {
+        //return GetLastError();
+        return false;
+    }
+#elif
+    return true;
+#endif
+}
