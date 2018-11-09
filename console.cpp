@@ -54,6 +54,7 @@ bool print_nchr(int n, char c){
     return true;
 }
 
+/*
 char get_key(void) {
     DWORD mode, cc;
     HANDLE h = GetStdHandle( STD_INPUT_HANDLE );
@@ -69,6 +70,7 @@ char get_key(void) {
     SetConsoleMode( h, mode );
     return c;
 }
+*/
 
 void do_msg(std::string msg){
     MessageBox(0, msg.c_str(), "Note: ", MB_OK);

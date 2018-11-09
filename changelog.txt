@@ -7,6 +7,10 @@ v0.1.0014
 - fixed level bugs
 - make boss death trigger door spawn
 
+v0.1.todo-gfx
+- fix tutorial drawing
+- rework tutorial level
+
 v0.1.todo
 - add restart level option
 - add puzzle levels

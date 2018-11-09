@@ -1,4 +1,4 @@
-/*enum color_t {
+enum color_t {
     NORMAL = 7, DARK_RED = 4, BRIGHT_RED = 12, GREEN = 10, LT_BLUE = 11, DEAD = 24, YELLOW = 14, GR_GREEN = 162, R_RED = 196
 };
 
@@ -13,4 +13,4 @@ void do_msg(std::string msg);
 
 
 bool paint_grid();
-*/
+
