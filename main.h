@@ -2,8 +2,8 @@
 #include <stdlib.h>
 #include <SFML/Graphics.hpp>
 
-#define S_WIDTH 100
-#define S_HEIGHT 50
+#define S_WIDTH 80
+#define S_HEIGHT 35
 
 #define TEX_SIZE 128
 #define TEX_SCALE .125
@@ -67,7 +67,7 @@ extern int timer_on;
 extern bool entity_spawn_lock;
 extern bool entity_overlap_check_on;
 
-void handle_key(sf::Keyboard::Key k);
+int handle_key(sf::Keyboard::Key k);
 
 extern sf::RenderTexture renderTexture;
 

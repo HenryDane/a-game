@@ -104,6 +104,11 @@ int main(){
                         state = 1; // tutorial screen
                     }
                     break;
+                case 4:
+                    if (event.key.code == sf::Keyboard::Space) {
+                        window.close();
+                        return 0;
+                    }
                 default:
                     std::cout << "bad state!" << std::endl;
                     break;
@@ -125,6 +130,8 @@ int main(){
             // level screen
             draw_level_screen(level);
             break;
+        case 4:
+            draw_death_screen();
         default:
             break;
 		}
@@ -146,8 +153,8 @@ int main(){
     return 0;
 }
 
-void handle_key(sf::Keyboard::Key k){
-    if (k < 0 || k > 26) return; // if not a-z
+int handle_key(sf::Keyboard::Key k){
+    if (k < 0 || k > 26) return 0; // if not a-z
 
     char c = ( (int) k ) + 65; // awful hack but ok
 
@@ -157,7 +164,7 @@ void handle_key(sf::Keyboard::Key k){
     case 'g':
         dots_on = !dots_on;
 //            draw();
-        return;
+        return 0;
     case 'T':
     case 't': // tutorial skip
         if (level >= 0){ // should be level == 0
@@ -167,7 +174,7 @@ void handle_key(sf::Keyboard::Key k){
             cha_y = S_HEIGHT / 2;
 
             do_gen_next_level();
-            return;
+            return 0;
         }
         break;
     case 'W':
@@ -230,10 +237,22 @@ void handle_key(sf::Keyboard::Key k){
         score = 5;
     }
 
+    // tick shield
+    if (shield > 0) shield--; // decrease shield
+    if (timer_on > 0) timer_on --;
+
+    // handle timer
+    if (timer_on == 0 && level == 10){
+        //do_win_screen();
+        make_entity_at(S_WIDTH / 2, S_HEIGHT / 2, 100);
+    } else if (timer_on == 0 && level != 10) {
+        score -= 1000;
+    }
+
     // game over check
     if (score < -20) {
         do_death_screen();
-        //return;
+        return 1;
     }
 
     // handle particles
@@ -245,4 +264,6 @@ void handle_key(sf::Keyboard::Key k){
             if (i > 0) i--;
         }
     }
+
+    return 0;
 }

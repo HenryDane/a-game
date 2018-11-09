@@ -104,7 +104,7 @@ void draw_gfx(void) {
     }
 
     // score and other indicators
-    jumptex_xyt(0, 0, "SCORE: " + patch::to_string(score) + " SHIELD: " + patch::to_string(((shield <= 0) ? 0 : shield)) + " LEVEL: " + patch::to_string(level));
+    jumptex_xyt(0, 0, "SCORE: " + patch::to_string(score) + " SHIELD: " + patch::to_string(((shield <= 0) ? 0 : shield)) + " LEVEL: " + patch::to_string(level) + " TIMER: " + ((timer_on < 0) ? "infinite" : patch::to_string(timer_on)));
 
     jumpwr_xyt(cha_x, cha_y + 2, CHAR_TEX);
 }
@@ -123,6 +123,17 @@ void draw_title_screen(){
 void draw_level_screen(int lvl){
     sf::Text text;
     text.setString("Level " + patch::to_string(lvl));
+    text.setPosition(10,10);
+    text.setCharacterSize(50);
+    text.setColor(sf::Color(255, 255, 255)); // todo animate colors
+    text.setFont(font);
+
+    renderTexture.draw(text);
+}
+
+void draw_death_screen(void){
+    sf::Text text;
+    text.setString("Game Over");
     text.setPosition(10,10);
     text.setCharacterSize(50);
     text.setColor(sf::Color(255, 255, 255)); // todo animate colors

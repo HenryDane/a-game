@@ -13,7 +13,7 @@ void do_win_screen(void){
 }
 
 void do_death_screen(void){
-
+    state = 4;
 }
 
 bool respawn_entity(int idx){
