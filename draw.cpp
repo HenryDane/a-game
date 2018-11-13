@@ -111,7 +111,7 @@ void draw_gfx(void) {
 
 void draw_title_screen(){
     sf::Text text;
-    text.setString("a game");
+    text.setString("a_game");
     text.setPosition(10,10);
     text.setCharacterSize(50);
     text.setColor(sf::Color(255, 255, 255)); // todo animate colors

@@ -260,7 +260,7 @@ bool generate_dense_terrain( void ){
         enemy_t e;
         e.init(rand() % S_WIDTH, rand() % S_HEIGHT, 0, global_uuid_next++);
         enemies.push_back(e);
-        register_object(e._id, 1 /*entity*/, i, 0);
+        register_object(e._id, 1 /*entity*/, i + 20, 0);
     }
 
     for (int i = 0; i < 50; i++){
@@ -493,4 +493,3 @@ void do_gen_next_level(void){
 
     //draw();
 }
-

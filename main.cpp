@@ -251,8 +251,8 @@ int handle_key(sf::Keyboard::Key k){
 
     // game over check
     if (score < -20) {
-        do_death_screen();
-        return 1;
+        //do_death_screen();
+        //return 1;
     }
 
     // handle particles
