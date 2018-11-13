@@ -1,8 +1,14 @@
 #include <vector>
 #include <stdlib.h>
+#include <SFML/Graphics.hpp>
 
-#define S_WIDTH 100
-#define S_HEIGHT 25
+#define S_WIDTH 80
+#define S_HEIGHT 35
+
+#define TEX_SIZE 128
+#define TEX_SCALE .125
+#define TILE_WIDTH (TEX_SIZE * TEX_SCALE)
+#define HALF_TILE_WIDTH (TILE_WIDTH / 2)
 
 #define __S(x) patch::to_string(x)
 
@@ -34,6 +40,13 @@ struct enemy_t {
     }
 };
 
+struct particle_t {
+    int x;
+    int y;
+    int ttl;
+    int type; // 0 -> fire, 1 -> v laser, 2 -> h laser
+};
+
 extern int cha_x;
 extern int cha_y;
 extern int score;
@@ -41,8 +54,11 @@ extern int global_score;
 extern int shield; // signals first turn
 extern std::vector<entity_t> entities;
 extern std::vector<enemy_t> enemies;
+extern std::vector<particle_t> particles;
 
 extern int level;
+
+extern int state;
 
 extern int global_uuid_next;
 
@@ -51,10 +67,8 @@ extern int timer_on;
 extern bool entity_spawn_lock;
 extern bool entity_overlap_check_on;
 
-// prototypes
-void draw(void);
-void draw_explosion(int x, int y, int r);
-void draw_level_screen(int lvl);
-void do_win_screen();
-void do_death_screen();
-void draw_level_text();
+int handle_key(sf::Keyboard::Key k);
+
+extern sf::RenderTexture renderTexture;
+
+extern char __NL;

@@ -2,6 +2,19 @@
 #include "console.h"
 #include "main.h"
 #include "interact.h"
+#include "draw.h"
+
+void do_level_screen(int lvl){
+
+}
+
+void do_win_screen(void){
+
+}
+
+void do_death_screen(void){
+    state = 4;
+}
 
 bool respawn_entity(int idx){
     if (entities[idx].t == 5) return false;
@@ -32,7 +45,7 @@ bool make_entity_at(int x, int y, int t){
         (t == 2 || t == 4)) return false;
 
     if (entity_overlap_check_on){
-        for (int i = 0; i < registry.size(); i++){
+        for (unsigned int i = 0; i < registry.size(); i++){
             int x1 = -1;
             int y1 = -1;
             get_registry_xy(i, x1, y1);
@@ -67,25 +80,27 @@ bool generate_tutorial(void){
     entities.clear();
     enemies.clear();
 
-    cha_x = 2; cha_y = S_HEIGHT / 2;
+    cha_x = 2; cha_y = 12;
 
-    make_entity_at(30, (S_HEIGHT / 2) + 1, 4 );
-    make_entity_at(30, (S_HEIGHT / 2) - 1, 4 );
+    make_entity_at(30, 12 + 1, 4 );
+    make_entity_at(30, 12 - 1, 4 );
 
-    make_entity_at(50, S_HEIGHT / 2, 1);
+    make_entity_at(50, 12, 1);
 
-    make_entity_at(55, S_HEIGHT / 2, 3);
-    make_entity_at(56, S_HEIGHT / 2, 3);
+    make_entity_at(55, 12, 3);
+    make_entity_at(56, 12, 3);
 
-    make_entity_at(60, S_HEIGHT / 2, 2);
+    make_entity_at(60, 12, 2);
 
-    make_entity_at(69, S_HEIGHT / 2, 4);
+    make_entity_at(69, 12, 4);
     enemy_t enemy;
-    enemy.init(70, S_HEIGHT / 2, -1, global_uuid_next++);
+    enemy.init(70, 12, -1, global_uuid_next++);
     enemies.push_back(enemy);
     register_object(enemy._id, 1, 0, -1);
 
-    make_entity_at(80, S_HEIGHT / 2, 5);
+    make_entity_at(80, 12, 5);
+
+    return true;
 }
 
 bool generate_lasers(void) {
@@ -245,7 +260,7 @@ bool generate_dense_terrain( void ){
         enemy_t e;
         e.init(rand() % S_WIDTH, rand() % S_HEIGHT, 0, global_uuid_next++);
         enemies.push_back(e);
-        register_object(e._id, 1 /*entity*/, i, 0);
+        register_object(e._id, 1 /*entity*/, i + 20, 0);
     }
 
     for (int i = 0; i < 50; i++){
@@ -474,8 +489,7 @@ void do_gen_next_level(void){
     player_set_safe(); // go to safe location
 
     clear_screen();
-    draw_level_screen(level);
+    do_level_screen(level);
 
-    draw();
+    //draw();
 }
-

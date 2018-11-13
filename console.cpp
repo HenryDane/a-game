@@ -90,6 +90,7 @@ bool print_nchr(int n, char c){
     return true;
 }
 
+/*
 bool print_nchrv(int n, int x, char c){
     for (int i = 0; i < n; i++){
         jump_xy(x, i);
@@ -97,8 +98,10 @@ bool print_nchrv(int n, int x, char c){
     }
     return true;
 }
+*/
 
 // windows only
+/*
 char get_key(void) {
     DWORD mode, cc;
     HANDLE h = GetStdHandle( STD_INPUT_HANDLE );
@@ -114,6 +117,7 @@ char get_key(void) {
     SetConsoleMode( h, mode );
     return c;
 }
+*/
 
 bool init_console_win(void){
 #ifdef _WIN32
@@ -131,7 +135,7 @@ bool init_console_win(void){
         //return GetLastError();
         return false;
     }
-
+    
     dwMode |= ENABLE_VIRTUAL_TERMINAL_PROCESSING;
     if (!SetConsoleMode(hOut, dwMode))
     {

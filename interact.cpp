@@ -64,6 +64,19 @@ bool set_registry_xy(int id, int x, int y){
     return true;
 }
 
+void place_explosion(int x, int y, int r){
+    for (int k = -r; k <= r; k++){
+        for (int m = -r; m <= r; m++){
+            particle_t p;
+            p.x = x + k;
+            p.y = y + m;
+            p.type = 0;
+            p.ttl = 1;
+            particles.push_back(p);
+        }
+    }
+}
+
 /*
 takes the objects registry id, and its planned movement, and checks for issues
 */
@@ -122,6 +135,7 @@ bool update_object (int id, int dx, int dy){
                     cha_x = S_WIDTH / 2;
                     cha_y = S_HEIGHT / 2;
                     do_gen_next_level();
+                    state = 2;
                     return true;
                 }
             } else if (registry[i].type == 0 && registry[i].rtype == 6) {
@@ -134,9 +148,8 @@ bool update_object (int id, int dx, int dy){
             if (registry[i].type == 0 && registry[i].rtype == 2){ // bomb
                 if (registry[id].type == 2 && shield == 0) score -= 10;
                 if (registry[id].type == 1 && registry[id].rtype != 4) enemies[registry[id].ridx]._score -= 10;
-                draw_explosion(x1, y1, 2);
+                place_explosion(x1, y1, 2);
                 respawn_entity(registry[i].ridx);
-                get_key(); // wait for react
             }
         }
     }
@@ -166,13 +179,20 @@ bool damage_object_x(int x, int dmg) {
         }
     }
 
-    set_color(color_t::BRIGHT_RED);
+    /*set_color(color_t::BRIGHT_RED);
     for (int i = 0; i <= S_HEIGHT; i++){
         jump_xy(x, i + 2);
         std::cout << "#";
     }
-    set_color(color_t::NORMAL);
-    get_key();
+    set_color(color_t::NORMAL);*/
+    for (int i = 0; i <= S_WIDTH; i++){
+        particle_t p;
+        p.x = x;
+        p.y = i;
+        p.ttl = 1;
+        p.type = 1;
+        particles.push_back(p);
+    }
 
     return true;
 }
@@ -199,13 +219,22 @@ bool damage_object_y(int y, int dmg) {
         }
     }
 
+    /*
     set_color(color_t::BRIGHT_RED);
     for (int i = 0; i <= S_WIDTH; i++){
         jump_xy(i, y + 2);
         std::cout << "#";
     }
-    set_color(color_t::NORMAL);
-    get_key();
+    set_color(color_t::NORMAL);particles.push_back(p);
+    */
+    for (int i = 0; i <= S_WIDTH; i++){
+        particle_t p;
+        p.x = i;
+        p.y = y;
+        p.ttl = 1;
+        p.type = 2;
+        particles.push_back(p);
+    }
 
     return true;
 }
