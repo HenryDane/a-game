@@ -5,8 +5,6 @@
 
 /*
 bool set_color(color_t c){
-    /*HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
-    SetConsoleTextAttribute(hConsole, c);*/
     int f, b = 0;
 
     switch (c){
@@ -51,9 +49,6 @@ bool jump_xy(int x, int y) {
 
 /*
 bool jump_xync(int x, int y) {
-    /*COORD p = { x, y };
-    SetConsoleCursorPosition( GetStdHandle( STD_OUTPUT_HANDLE ), p );*/
-
     // i dont know why its (y + 1) but dont change it please
     std::cout << "\033[" << y + 1 << ";" << x << "H";
     return true;
@@ -75,15 +70,6 @@ bool paint_grid() {
 /*
 bool clear_screen() {
     std::cout << "\033[2J";
-    /*char fill = ' ';
-    COORD tl = {0,0};
-    CONSOLE_SCREEN_BUFFER_INFO s;
-    HANDLE console = GetStdHandle(STD_OUTPUT_HANDLE);
-    GetConsoleScreenBufferInfo(console, &s);
-    DWORD written, cells = s.dwSize.X * s.dwSize.Y;
-    FillConsoleOutputCharacter(console, fill, cells, tl, &written);
-    FillConsoleOutputAttribute(console, s.wAttributes, cells, tl, &written);
-    SetConsoleCursorPosition(console, tl);*/
     return true;
 }
 */
@@ -125,6 +111,7 @@ char get_key(void) {
 }
 */
 
+/*
 bool init_console_win(void){
 #ifdef _WIN32
     // Set output mode to handle virtual terminal sequences
@@ -141,7 +128,7 @@ bool init_console_win(void){
         //return GetLastError();
         return false;
     }
-    
+
     dwMode |= ENABLE_VIRTUAL_TERMINAL_PROCESSING;
     if (!SetConsoleMode(hOut, dwMode))
     {
@@ -152,3 +139,4 @@ bool init_console_win(void){
     return true;
 #endif
 }
+*/
