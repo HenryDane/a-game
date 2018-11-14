@@ -1,3 +1,20 @@
+v0.2.0000
+- fixed tutorial drawing
+- fixed redraw
+- added graphics
+- fixed laser/enemy mixup
+
+v0.2.todo
+- restart level option
+- game saves
+- animation of sprite transitions
+- use sprites properly
+- add more levels
+
+v0.1.0016
+- clear screen on startup
+- ANSI color and console handling so compiles for other platforms
+
 v0.1.0014
 - made level next key be space
 - fixed spawn on pacman lvl
@@ -6,17 +23,6 @@ v0.1.0014
 - reworked levels 7, 8, 9
 - fixed level bugs
 - make boss death trigger door spawn
-
-v0.1.todo-gfx
-- fix tutorial drawing
-- rework tutorial level
-
-v0.1.todo
-- add restart level option
-- add puzzle levels
-- redraw w/o explosions after death for aesthetics
-- add level explanations 
-- selective redraw
 
 v0.1.0008
 - made grid optional
