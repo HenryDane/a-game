@@ -32,6 +32,7 @@ int timer_on = -1; // if >= 0 timer is on
 bool dots_on = false; // flag for dots display
 bool entity_spawn_lock = false; // flag for deleting everything nearby
 bool entity_overlap_check_on = false; // prevent overlap spawn
+bool respawn_bomb_on = true;
 
 // GAME STATE
 int state = 0;
@@ -210,7 +211,7 @@ int handle_key(sf::Keyboard::Key k){
             level != 8 &&
             level != 9) {
             score -= 5;
-            draw_explosion(cha_x, cha_y, 2);
+            place_explosion(cha_x, cha_y, 2);
             //get_key();
 
             for (unsigned int i = 0; i < enemies.size(); i++){
@@ -251,8 +252,8 @@ int handle_key(sf::Keyboard::Key k){
 
     // game over check
     if (score < -20) {
-        do_death_screen();
-        return 1;
+        //do_death_screen();
+        //return 1;
     }
 
     // handle particles
@@ -261,7 +262,8 @@ int handle_key(sf::Keyboard::Key k){
 
         if (particles[i].ttl < 0) {
             particles.erase(particles.begin() + i);
-            if (i > 0) i--;
+            //if (i == 0) i = 0;
+            if (i >= 0) i--;
         }
     }
 
