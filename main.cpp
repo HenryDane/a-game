@@ -13,6 +13,7 @@
 #include "patch.h"
 #include "tex_print.h"
 #include "draw.h"
+#include "audio.h"
 
 // globals lol
 int cha_x = S_WIDTH / 2;
@@ -68,10 +69,14 @@ int main(){
 
     player_set_safe(); // go to safe location
 
+    update_sound();
+
     while (window.isOpen()) {
         //clear the screen
 		window.clear();
         renderTexture.clear();
+
+        check_audio_state();
 
 		//process events
 		sf::Event event;
@@ -84,6 +89,11 @@ int main(){
                 if (event.key.code == sf::Keyboard::Escape) {
                     window.close();
                     return 0;
+                } else if (event.key.code == sf::Keyboard::Tab) {
+                    std::cout << music.getPlayingOffset().asSeconds() << " | " << music.getDuration().asSeconds() << std::endl;
+                } else if (event.key.code == sf::Keyboard::Tilde) {
+                    auto newPos = music.getPlayingOffset() + sf::seconds(30);
+                    music.setPlayingOffset(sf::Time(newPos));
                 }
 
                 switch (state) {
