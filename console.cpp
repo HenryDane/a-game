@@ -3,13 +3,8 @@
 #include "windows.h"
 #include "console.h"
 
-#ifndef ENABLE_VIRTUAL_TERMINAL_PROCESSING
-#define ENABLE_VIRTUAL_TERMINAL_PROCESSING 0x0004
-#endif
-
+/*
 bool set_color(color_t c){
-    /*HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
-    SetConsoleTextAttribute(hConsole, c);*/
     int f, b = 0;
 
     switch (c){
@@ -39,27 +34,28 @@ bool set_color(color_t c){
     std::cout << "\033[48;5;" << b << "m";
     return true;
 }
+*/
 
 bool jump_xy(int x, int y) {
-    if (x < 0) x = 0;
+/*    if (x < 0) x = 0;
     if (y < 0) y = 0;
     if (x > S_WIDTH) x = S_WIDTH;
     if (y > S_HEIGHT + 4) y = S_HEIGHT + 4;
-    /*COORD p = { x, y };
-    SetConsoleCursorPosition( GetStdHandle( STD_OUTPUT_HANDLE ), p );*/
     jump_xync(x, y);
+
     return true;
+*/
 }
 
+/*
 bool jump_xync(int x, int y) {
-    /*COORD p = { x, y };
-    SetConsoleCursorPosition( GetStdHandle( STD_OUTPUT_HANDLE ), p );*/
-
     // i dont know why its (y + 1) but dont change it please
     std::cout << "\033[" << y + 1 << ";" << x << "H";
     return true;
 }
+*/
 
+/*
 bool paint_grid() {
     for (int y = 0; y <= S_HEIGHT; y++){
         jump_xy(0, y + 2);
@@ -69,26 +65,22 @@ bool paint_grid() {
     }
     return true;
 }
+*/
 
+/*
 bool clear_screen() {
     std::cout << "\033[2J";
-    /*char fill = ' ';
-    COORD tl = {0,0};
-    CONSOLE_SCREEN_BUFFER_INFO s;
-    HANDLE console = GetStdHandle(STD_OUTPUT_HANDLE);
-    GetConsoleScreenBufferInfo(console, &s);
-    DWORD written, cells = s.dwSize.X * s.dwSize.Y;
-    FillConsoleOutputCharacter(console, fill, cells, tl, &written);
-    FillConsoleOutputAttribute(console, s.wAttributes, cells, tl, &written);
-    SetConsoleCursorPosition(console, tl);*/
     return true;
 }
+*/
 
+/*
 bool print_nchr(int n, char c){
     for (int i = 0; i < n; i++)
         std::cout << c;
     return true;
 }
+*/
 
 /*
 bool print_nchrv(int n, int x, char c){
@@ -119,6 +111,7 @@ char get_key(void) {
 }
 */
 
+/*
 bool init_console_win(void){
 #ifdef _WIN32
     // Set output mode to handle virtual terminal sequences
@@ -135,7 +128,7 @@ bool init_console_win(void){
         //return GetLastError();
         return false;
     }
-    
+
     dwMode |= ENABLE_VIRTUAL_TERMINAL_PROCESSING;
     if (!SetConsoleMode(hOut, dwMode))
     {
@@ -146,3 +139,4 @@ bool init_console_win(void){
     return true;
 #endif
 }
+*/

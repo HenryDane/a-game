@@ -3,7 +3,7 @@
 #include <SFML/Graphics.hpp>
 
 #define S_WIDTH 80
-#define S_HEIGHT 35
+#define S_HEIGHT 36
 
 #define TEX_SIZE 128
 #define TEX_SCALE .125
@@ -66,6 +66,7 @@ extern bool regen_on;
 extern int timer_on;
 extern bool entity_spawn_lock;
 extern bool entity_overlap_check_on;
+extern bool respawn_bomb_on;
 
 int handle_key(sf::Keyboard::Key k);
 

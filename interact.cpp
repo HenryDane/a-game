@@ -1,5 +1,6 @@
 #include <vector>
 #include <iostream>
+#include <SFML/Graphics.hpp>
 #include "windows.h"
 #include "patch.h"
 #include "main.h"
@@ -8,10 +9,20 @@
 #include "game.h"
 
 std::vector<registry_key_t> registry;
+/*
+std::vector<sf::Sprite> sprite_registry;
+int global_sprite_idx;
+*/
 
 bool init_registry (void){
     registry.clear();
     registry.reserve(200);
+/*
+    sprite_registry.clear();
+    sprite_registry.reserve(300);
+
+    global_sprite_idx = 0;
+*/
     return true;
 }
 
@@ -21,8 +32,20 @@ bool register_object(int id, int type, int ridx, int rtype){
     rk.type = type;
     rk.ridx = ridx;
     rk.rtype = rtype;
+/*
+    rk.tex_state = 0;
+    rk.t = 0;
+*/
     registry.push_back(rk);
-
+/*
+    sf::Sprite s;
+    {
+        int x, y = 0;
+        get_registry_xy(id, x, y);
+        s.setPosition(x, y);
+    }
+    sprite_registry.push_back(s);
+*/
     return true;
 }
 
@@ -71,7 +94,7 @@ void place_explosion(int x, int y, int r){
             p.x = x + k;
             p.y = y + m;
             p.type = 0;
-            p.ttl = 1;
+            p.ttl = rand() % 3 + 1; // so it looks cool
             particles.push_back(p);
         }
     }
@@ -112,7 +135,7 @@ bool update_object (int id, int dx, int dy){
 
     // interaction check
     for (unsigned int i = 0; i < registry.size(); i++){
-        if (i == id) continue; // no self-interaction
+        if (i == ( unsigned int ) id) continue; // no self-interaction
 
         int x1 = -1; int y1 = -1; get_registry_xy(i, x1, y1); // get xy values of object
 

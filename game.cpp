@@ -19,6 +19,12 @@ void do_death_screen(void){
 bool respawn_entity(int idx){
     if (entities[idx].t == 5) return false;
 
+    if (!respawn_bomb_on && entities[idx].t == 2) {
+        entities[idx].x = -100;
+        entities[idx].y = -100;
+        return true;
+    }
+
     if (regen_on){
         // TODO edit registration
         int x = rand() % S_WIDTH;
@@ -61,6 +67,24 @@ bool make_entity_at(int x, int y, int t){
     entities.push_back(e);
     register_object(global_uuid_next++, 0 /*entity*/, entities.size() - 1, t);
     return true;
+}
+
+void place_doors(void){
+    make_entity_at(0, 0, 5);
+    make_entity_at(S_WIDTH, 0, 5);
+    make_entity_at(S_WIDTH, S_HEIGHT, 5);
+    make_entity_at(0, S_HEIGHT, 5);
+}
+
+void place_ring_xyt(int x, int y, int t){
+    make_entity_at(x - 1, y - 1, t);
+    make_entity_at(x, y - 1, t);
+    make_entity_at(x + 1, y - 1, t);
+    make_entity_at(x - 1, y + 1, t);
+    make_entity_at(x, y + 1, t);
+    make_entity_at(x + 1, y + 1, t);
+    make_entity_at(x - 1, y, t);
+    make_entity_at(x + 1, y, t);
 }
 
 bool generate_empty(void){
@@ -121,20 +145,16 @@ bool generate_lasers(void) {
         register_object(e._id, 1 /*entity*/, i, 0);
     }
 
-    make_entity_at(0, 0, 5);
-    make_entity_at(S_WIDTH, 0, 5);
-    make_entity_at(S_WIDTH, S_HEIGHT, 5);
-    make_entity_at(0, S_HEIGHT, 5);
+    place_doors();
 
     return true;
 }
 
 bool generate_pacman(void) {
-    //cha_x = S_WIDTH / 2;
-    //cha_y = S_HEIGHT / 2;
     entities.clear();
     enemies.clear();
     regen_on = false;
+    timer_on = -10;
 
     entity_spawn_lock = true;
 
@@ -156,25 +176,64 @@ bool generate_pacman(void) {
         }
     }
 
-    make_entity_at(0, 0, 5);
-    make_entity_at(S_WIDTH, 0, 5);
-    make_entity_at(S_WIDTH, S_HEIGHT, 5);
-    make_entity_at(0, S_HEIGHT, 5);
+    place_doors();
 
     entity_spawn_lock = false;
 
     return true;
 }
 
-bool generate_gridworld(void) {
+bool generate_speedrun(void) {
     regen_on = true;
-    timer_on = 10;
-    cha_x = S_WIDTH / 2;
+    timer_on = 5; // if no regen, use 18
+	
+	cha_x = S_WIDTH / 2;
     cha_y = S_HEIGHT / 2;
     entities.clear();
     enemies.clear();
+	
+	make_entity_at(cha_x - 1, cha_y - 1, 6);
+    make_entity_at(cha_x, cha_y - 1, 6);
+    make_entity_at(cha_x + 1, cha_y - 1, 6);
+    make_entity_at(cha_x - 1, cha_y + 1, 6);
+    make_entity_at(cha_x, cha_y + 1, 6);
+    make_entity_at(cha_x + 1, cha_y + 1, 6);
+    make_entity_at(cha_x - 1, cha_y, 6);
+    make_entity_at(cha_x + 1, cha_y, 6);
+	
+	for (int i = 0; i < S_WIDTH + 1; i++){
+        for (int j = 0; j < S_HEIGHT + 1; j++){
+            if ((i == 0 && j == 0) ||
+                (i == S_WIDTH && j == 0 ) ||
+                (i == S_WIDTH && j == S_HEIGHT) ||
+                (i == 0 && j == S_HEIGHT)) continue;
 
-    for (int i = 0; i < S_WIDTH; i++){
+            if (i == S_WIDTH / 2 && j == S_HEIGHT / 2) continue;
+
+            if (i % 2 == 0 && j % 2 == 0) {
+                make_entity_at(i, j, 4);
+            }
+        }
+    }
+	
+	make_entity_at(0, 0, 5);
+    make_entity_at(S_WIDTH, 0, 5);
+    make_entity_at(S_WIDTH, S_HEIGHT, 5);
+    make_entity_at(0, S_HEIGHT, 5);
+	
+	return true;
+}
+
+bool generate_gridworld(void) {
+    regen_on = true;
+    timer_on = 10;
+	
+	cha_x = S_WIDTH / 2;
+    cha_y = S_HEIGHT / 2;
+    entities.clear();
+    enemies.clear();
+	
+	for (int i = 0; i < S_WIDTH; i++){
         for (int j = 0; j < S_HEIGHT; j++){
             if (rand() % 4 == 0){
                 make_entity_at(i, j, 4);
@@ -182,19 +241,48 @@ bool generate_gridworld(void) {
                 if (rand() % 5 == 0) {
                     make_entity_at(i, j, (rand() % 3 == 0) ? 6 : 1);
                 }
+	        }
+        }
+    }
+	
+	make_entity_at(0, 0, 5);
+    make_entity_at(S_WIDTH, 0, 5);
+    make_entity_at(S_WIDTH, S_HEIGHT, 5);
+    make_entity_at(0, S_HEIGHT, 5);
+	
+	return true;
+}
+
+void generate_impossible(){
+    regen_on = true;
+    respawn_bomb_on = false;
+    timer_on = -10; // if no regen, use 18
+    cha_x = S_WIDTH / 2;
+    cha_y = S_HEIGHT / 2;
+    entities.clear();
+    enemies.clear();
+
+    for (int i = 0; i < S_WIDTH + 1; i++){
+        for (int j = 0; j < S_HEIGHT + 1; j++){
+            if ((i == 0 && j == 0) ||
+                (i == S_WIDTH && j == 0 ) ||
+                (i == S_WIDTH && j == S_HEIGHT) ||
+                (i == 0 && j == S_HEIGHT)) continue;
+
+            if (abs(i- cha_x) <= 3 && abs(j - cha_y) <= 3) continue;
+
+            if (i % 2 == 0 && j % 2 == 0) {
+                make_entity_at(i, j, 2);
             }
         }
     }
 
-    make_entity_at(0, 0, 5);
-    make_entity_at(S_WIDTH, 0, 5);
-    make_entity_at(S_WIDTH, S_HEIGHT, 5);
-    make_entity_at(0, S_HEIGHT, 5);
+    place_ring_xyt(cha_x, cha_y, 3); // so that coins are on top
 
-    return true;
+    place_doors();
 }
 
-bool generate_terrain( void ){
+bool generate_terrain(void){
     regen_on = true;
     timer_on = -10;
     cha_x = S_WIDTH / 2;
@@ -249,10 +337,7 @@ bool generate_terrain( void ){
         }
     }
 
-    make_entity_at(0, 0, 5);
-    make_entity_at(S_WIDTH, 0, 5);
-    make_entity_at(S_WIDTH, S_HEIGHT, 5);
-    make_entity_at(0, S_HEIGHT, 5);
+    place_doors();
 
     return true;
 }
@@ -266,10 +351,6 @@ bool generate_dense_terrain( void ){
     enemies.clear();
 
     entity_overlap_check_on = true;
-
-    /*for (int i = 0; i < 100; i++){
-        make_entity_at(rand() % S_WIDTH, rand() % S_HEIGHT, rand() % 4);
-    }*/
 
     int ent_spawn = 0;
     while (ent_spawn < 100){
@@ -394,7 +475,7 @@ bool generate_boss(void){
 bool player_set_safe(void){
     // go to safe space
     for (unsigned int i = 0; i < entities.size(); i++){
-        if (abs(entities[i].x - cha_x) <= 3 && abs(entities[i].y < cha_y) <= 3){
+        if (abs(entities[i].x - cha_x) <= 3 && abs(entities[i].y - cha_y) <= 3){
             if (entities[i].t == 2) respawn_entity(i);
         }
     }
@@ -474,12 +555,18 @@ void tick_enemy(enemy_t &en, std::vector<entity_t> &e, int cx, int cy){
 
 void do_gen_next_level(void){
     registry.clear();
+    enemies.clear();
+    particles.clear();
+    entities.clear();
     global_uuid_next = 0;
 
     global_score += score;
     score = 5;
 
     register_object(global_uuid_next++, 2, 0, 0);
+
+    // reset flags
+    respawn_bomb_on = true;
 
     switch(level){
     case 0:
@@ -489,7 +576,6 @@ void do_gen_next_level(void){
 //        generate_gridworld();
         break;
     case 3:
-        //generate_pacman();
         generate_safe_run();
         break;
     case 4:
@@ -497,7 +583,6 @@ void do_gen_next_level(void){
         generate_lasers();
         break;
     case 6:
-        //generate_safe_run();
         generate_pacman();
         break;
     case 7:
@@ -536,7 +621,6 @@ void do_gen_next_level(void){
     cha_y = S_HEIGHT / 2;
     player_set_safe(); // go to safe location
 
-//    clear_screen();
     do_level_screen(level);
 
     //draw();
