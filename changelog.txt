@@ -1,15 +1,20 @@
-v0.2.0000
-- fixed tutorial drawing
-- fixed redraw
-- added graphics
-- fixed laser/enemy mixup
+v0.3.0000
+- added music and loops
+- multiple small fixes
+- bugfixes
 
-v0.2.todo
+v0.3.todo
 - restart level option
 - game saves
 - animation of sprite transitions
 - use sprites properly
 - add more levels
+
+v0.2.0000
+- fixed tutorial drawing
+- fixed redraw
+- added graphics
+- fixed laser/enemy mixup
 
 v0.1.0016
 - clear screen on startup
