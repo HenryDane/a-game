@@ -13,6 +13,7 @@
 #include "patch.h"
 #include "tex_print.h"
 #include "draw.h"
+#include "audio.h"
 
 // globals lol
 int cha_x = S_WIDTH / 2;
@@ -32,6 +33,7 @@ int timer_on = -1; // if >= 0 timer is on
 bool dots_on = false; // flag for dots display
 bool entity_spawn_lock = false; // flag for deleting everything nearby
 bool entity_overlap_check_on = false; // prevent overlap spawn
+bool respawn_bomb_on = true;
 
 // GAME STATE
 int state = 0;
@@ -67,10 +69,14 @@ int main(){
 
     player_set_safe(); // go to safe location
 
+    update_sound();
+
     while (window.isOpen()) {
         //clear the screen
 		window.clear();
         renderTexture.clear();
+
+        check_audio_state();
 
 		//process events
 		sf::Event event;
@@ -83,6 +89,11 @@ int main(){
                 if (event.key.code == sf::Keyboard::Escape) {
                     window.close();
                     return 0;
+                } else if (event.key.code == sf::Keyboard::Tab) {
+                    std::cout << music.getPlayingOffset().asSeconds() << " | " << music.getDuration().asSeconds() << std::endl;
+                } else if (event.key.code == sf::Keyboard::Tilde) {
+                    auto newPos = music.getPlayingOffset() + sf::seconds(30);
+                    music.setPlayingOffset(sf::Time(newPos));
                 }
 
                 switch (state) {
@@ -210,7 +221,7 @@ int handle_key(sf::Keyboard::Key k){
             level != 8 &&
             level != 9) {
             score -= 5;
-            draw_explosion(cha_x, cha_y, 2);
+            place_explosion(cha_x, cha_y, 2);
             //get_key();
 
             for (unsigned int i = 0; i < enemies.size(); i++){
@@ -261,7 +272,8 @@ int handle_key(sf::Keyboard::Key k){
 
         if (particles[i].ttl < 0) {
             particles.erase(particles.begin() + i);
-            if (i > 0) i--;
+            //if (i == 0) i = 0;
+            if (i >= 0) i--;
         }
     }
 
