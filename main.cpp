@@ -104,6 +104,7 @@ int main(){
                         state = 1; // tutorial screen
                     }
                     break;
+                case 5:
                 case 4:
                     if (event.key.code == sf::Keyboard::Space) {
                         window.close();
@@ -132,6 +133,10 @@ int main(){
             break;
         case 4:
             draw_death_screen();
+            break;
+        case 5:
+            //draw_win_screen();
+            break;
         default:
             break;
 		}
@@ -251,8 +256,8 @@ int handle_key(sf::Keyboard::Key k){
 
     // game over check
     if (score < -20) {
-        //do_death_screen();
-        //return 1;
+        do_death_screen();
+        return 1;
     }
 
     // handle particles

@@ -141,3 +141,14 @@ void draw_death_screen(void){
 
     renderTexture.draw(text);
 }
+
+void draw_win_screen(void){
+    sf::Text text;
+    text.setString("You Win");
+    text.setPosition(10,10);
+    text.setCharacterSize(50);
+    text.setColor(sf::Color(255, 255, 255)); // todo animate colors
+    text.setFont(font);
+
+    renderTexture.draw(text);
+}

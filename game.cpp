@@ -9,7 +9,7 @@ void do_level_screen(int lvl){
 }
 
 void do_win_screen(void){
-
+    state = 5;
 }
 
 void do_death_screen(void){
@@ -162,6 +162,34 @@ bool generate_pacman(void) {
     make_entity_at(0, S_HEIGHT, 5);
 
     entity_spawn_lock = false;
+
+    return true;
+}
+
+bool generate_gridworld(void) {
+    regen_on = true;
+    timer_on = 10;
+    cha_x = S_WIDTH / 2;
+    cha_y = S_HEIGHT / 2;
+    entities.clear();
+    enemies.clear();
+
+    for (int i = 0; i < S_WIDTH; i++){
+        for (int j = 0; j < S_HEIGHT; j++){
+            if (rand() % 4 == 0){
+                make_entity_at(i, j, 4);
+            } else {
+                if (rand() % 5 == 0) {
+                    make_entity_at(i, j, (rand() % 3 == 0) ? 6 : 1);
+                }
+            }
+        }
+    }
+
+    make_entity_at(0, 0, 5);
+    make_entity_at(S_WIDTH, 0, 5);
+    make_entity_at(S_WIDTH, S_HEIGHT, 5);
+    make_entity_at(0, S_HEIGHT, 5);
 
     return true;
 }
@@ -458,6 +486,7 @@ void do_gen_next_level(void){
     case 1:
     case 2:
         generate_terrain();
+//        generate_gridworld();
         break;
     case 3:
         //generate_pacman();
@@ -479,6 +508,25 @@ void do_gen_next_level(void){
     case 10:
         generate_boss();
         break;
+    case 11:
+    case 12:
+        generate_gridworld();
+        break;
+    case 13:
+
+        break;
+    case 14:
+    case 15:
+
+        break;
+    case 17:
+    case 18:
+    case 19:
+
+        break;
+    case 20:
+
+        break;
     default:
         generate_empty();
         break;
@@ -488,7 +536,7 @@ void do_gen_next_level(void){
     cha_y = S_HEIGHT / 2;
     player_set_safe(); // go to safe location
 
-    clear_screen();
+//    clear_screen();
     do_level_screen(level);
 
     //draw();
