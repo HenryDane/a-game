@@ -1,3 +1,10 @@
+v0.3.0005
+- restyled screens
+- added more levels
+- added skip key
+- added volume up key
+- added volume down key
+
 v0.3.0000
 - added music and loops
 - multiple small fixes
@@ -8,7 +15,6 @@ v0.3.todo
 - game saves
 - animation of sprite transitions
 - use sprites properly
-- add more levels
 
 v0.2.0000
 - fixed tutorial drawing

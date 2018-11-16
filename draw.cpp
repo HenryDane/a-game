@@ -110,10 +110,24 @@ void draw_gfx(void) {
 void draw_title_screen(){
     sf::Text text;
     text.setString("a_game");
-    text.setPosition(10,10);
+    //text.setPosition(10,10);
     text.setCharacterSize(50);
     text.setColor(sf::Color(255, 255, 255)); // todo animate colors
     text.setFont(font);
+
+    // center text
+    sf::FloatRect b = text.getLocalBounds();
+    text.setPosition(((S_WIDTH + 1) * 16 - b.width) / 2, ((S_HEIGHT + 3) * 16 - b.height) / 2);
+
+    renderTexture.draw(text);
+
+    text.setString("Press any key to begin");
+    text.setCharacterSize(13);
+    text.setColor(sf::Color(0, 255, 0));
+
+    // center text
+    b = text.getLocalBounds();
+    text.setPosition(((S_WIDTH + 1) * 16 - b.width) / 2, ((S_HEIGHT + 3) * 16 - b.height) / 2 + 75);
 
     renderTexture.draw(text);
 }
@@ -121,21 +135,92 @@ void draw_title_screen(){
 void draw_level_screen(int lvl){
     sf::Text text;
     text.setString("Level " + patch::to_string(lvl));
-    text.setPosition(10,10);
+    //text.setPosition(10,10);
     text.setCharacterSize(50);
     text.setColor(sf::Color(255, 255, 255)); // todo animate colors
     text.setFont(font);
 
+    // center text
+    sf::FloatRect b = text.getLocalBounds();
+    text.setPosition(((S_WIDTH + 1) * 16 - b.width) / 2, ((S_HEIGHT + 3) * 16 - b.height) / 2);
+
+    renderTexture.draw(text);
+
+    text.setCharacterSize(13);
+    text.setColor(sf::Color(255, 0, 0));
+
+    switch (lvl) {
+    case 0:
+        text.setString("You can still die on the tutorial!");
+        break;
+    case 1:
+    case 2:
+        text.setString("Patience is a virtue");
+    case 3:
+    case 12:
+        text.setString("Collect time tokens to avoid dying by the clock!");
+        break;
+    case 4:
+    case 5:
+        text.setString("Watch out for those lasers!");
+        break;
+    case 6:
+        text.setString("How good is your concentration?");
+        break;
+    case 7:
+        text.setString("This is hard. You'll only have to do it once.");
+        break;
+    case 8:
+    case 9:
+        text.setString("I lied. Get baited.");
+        break;
+    case 10:
+        text.setString("Get ready for a bossfight!");
+        break;
+    case 11:
+        text.setString("Suprise. I lied agian. This level will be easy.");
+        break;
+    case 13:
+        text.setString("This is impossible.");
+        break;
+    case 14:
+        text.setString("DEJA VU NEVER BEEN TO THIS PLACE BEFORE !!1!!11one!one!");
+        break;
+    case 15:
+        text.setString("Here's the tutorial agian. Why do you even trust me?");
+        break;
+    default:
+        text.setString("How'd you get to this level?");
+        break;
+    }
+
+    // center text
+    b = text.getLocalBounds();
+    text.setPosition(((S_WIDTH + 1) * 16 - b.width) / 2, ((S_HEIGHT + 3) * 16 - b.height) / 2 + 75);
     renderTexture.draw(text);
 }
 
 void draw_death_screen(void){
     sf::Text text;
     text.setString("Game Over");
-    text.setPosition(10,10);
+    //text.setPosition(10,10);
     text.setCharacterSize(50);
-    text.setColor(sf::Color(255, 255, 255)); // todo animate colors
+    text.setColor(sf::Color(255, 0, 0)); // todo animate colors
     text.setFont(font);
+
+    // center text
+    sf::FloatRect b = text.getLocalBounds();
+    text.setPosition(((S_WIDTH + 1) * 16 - b.width) / 2, ((S_HEIGHT + 3) * 16 - b.height) / 2);
+
+    renderTexture.draw(text);
+
+    text.setString("Your final score: " + patch::to_string(global_score) );
+    text.setCharacterSize(13);
+    text.setColor(sf::Color(255, 255, 255));
+
+    // center text
+    b = text.getLocalBounds();
+    text.setPosition(((S_WIDTH + 1) * 16 - b.width) / 2, ((S_HEIGHT + 3) * 16 - b.height) / 2 + 75);
 
     renderTexture.draw(text);
 }
@@ -143,10 +228,24 @@ void draw_death_screen(void){
 void draw_win_screen(void){
     sf::Text text;
     text.setString("You Win");
-    text.setPosition(10,10);
+    //text.setPosition(10,10);
     text.setCharacterSize(50);
-    text.setColor(sf::Color(255, 255, 255)); // todo animate colors
+    text.setColor(sf::Color(0, 255, 0)); // todo animate colors
     text.setFont(font);
+
+    // center text
+    sf::FloatRect b = text.getLocalBounds();
+    text.setPosition(((S_WIDTH + 1) * 16 - b.width) / 2, ((S_HEIGHT + 3) * 16 - b.height) / 2);
+
+    renderTexture.draw(text);
+
+    text.setString("Your final score: " + patch::to_string(global_score) );
+    text.setCharacterSize(13);
+    text.setColor(sf::Color(255, 255, 255));
+
+    // center text
+    b = text.getLocalBounds();
+    text.setPosition(((S_WIDTH + 1) * 16 - b.width) / 2, ((S_HEIGHT + 3) * 16 - b.height) / 2 + 75);
 
     renderTexture.draw(text);
 }

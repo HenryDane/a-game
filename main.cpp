@@ -71,6 +71,8 @@ int main(){
 
     update_sound();
 
+    decrease_volume(100);
+
     while (window.isOpen()) {
         //clear the screen
 		window.clear();
@@ -90,10 +92,16 @@ int main(){
                     window.close();
                     return 0;
                 } else if (event.key.code == sf::Keyboard::Tab) {
-                    std::cout << music.getPlayingOffset().asSeconds() << " | " << music.getDuration().asSeconds() << std::endl;
+                    //std::cout << music.getPlayingOffset().asSeconds() << " | " << music.getDuration().asSeconds() << std::endl;
+                    //score += 1000;
                 } else if (event.key.code == sf::Keyboard::Tilde) {
-                    auto newPos = music.getPlayingOffset() + sf::seconds(30);
-                    music.setPlayingOffset(sf::Time(newPos));
+                    skip_seconds(30);
+                } else if (event.key.code == sf::Keyboard::LBracket) { // '['
+                    decrease_volume(20);
+                } else if (event.key.code == sf::Keyboard::RBracket) { // '['
+                    increase_volume(20);
+                } else if (event.key.code == sf::Keyboard::BackSlash) {
+                    skip_current_song();
                 }
 
                 switch (state) {
@@ -146,7 +154,7 @@ int main(){
             draw_death_screen();
             break;
         case 5:
-            //draw_win_screen();
+            draw_win_screen();
             break;
         default:
             break;
@@ -258,10 +266,10 @@ int handle_key(sf::Keyboard::Key k){
     if (timer_on > 0) timer_on --;
 
     // handle timer
-    if (timer_on == 0 && level == 10){
+    if (timer_on == 0 && level == 15){
         //do_win_screen();
         make_entity_at(S_WIDTH / 2, S_HEIGHT / 2, 100);
-    } else if (timer_on == 0 && level != 10) {
+    } else if (timer_on == 0 && level != 15) {
         score -= 1000;
     }
 

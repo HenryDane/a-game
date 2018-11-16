@@ -47,9 +47,8 @@ bool update_sound(void){
     return true;
 }
 
-bool check_audio_state() {
-    if (current_music_state == 1) return false;
-    if (music.getStatus() != sf::Sound::Stopped) return false;
+void skip_current_song(void){
+    music.stop();
 
     if (current_music_state == 0) {
         current_music_state = 2;
@@ -60,6 +59,28 @@ bool check_audio_state() {
     }
 
     update_sound();
+}
+
+bool check_audio_state() {
+    if (current_music_state == 1) return false;
+    if (music.getStatus() != sf::Sound::Stopped) return false;
+
+    skip_current_song();
 
     return true;
+}
+
+void skip_seconds(int s){
+    music.pause();
+    auto newPos = music.getPlayingOffset() + sf::seconds(s);
+    music.setPlayingOffset(std::min(music.getDuration(), sf::Time(newPos)));
+    music.play();
+}
+
+void decrease_volume(int v) {
+    music.setVolume(std::max(0.0f, music.getVolume() - v));
+}
+
+void increase_volume(int v){
+    music.setVolume(std::min(100.0f, music.getVolume() + v));
 }

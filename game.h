@@ -9,7 +9,8 @@ bool generate_tutorial(void);
 bool generate_dense_terrain(void);
 bool generate_gridworld(void);
 bool generate_speedrun(void);
-void generate_impossible(void);
+bool generate_impossible(void);
+bool generate_pacman_time(void);
 
 bool player_set_safe(void);
 bool make_entity_at(int x, int y, int t);

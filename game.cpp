@@ -183,15 +183,50 @@ bool generate_pacman(void) {
     return true;
 }
 
+bool generate_pacman_time(void) {
+    entities.clear();
+    enemies.clear();
+    regen_on = false;
+    timer_on = 10;
+
+    entity_spawn_lock = true;
+
+    for (int i = 0; i < S_WIDTH + 1; i++){
+        for (int j = 0; j < S_HEIGHT + 1; j++){
+            if ((i == 0 && j == 0) ||
+                (i == S_WIDTH && j == 0 ) ||
+                (i == S_WIDTH && j == S_HEIGHT) ||
+                (i == 0 && j == S_HEIGHT)) continue;
+
+            int k = rand() % 10;
+            if (k == 0 || k == 1){
+                make_entity_at(i, j, 4);
+            } else if (k == 2 || k == 3 || k == 4) {
+                make_entity_at(i, j, 2);
+            } else if (k == 5) {
+                make_entity_at(i, j, (rand () % 2 == 0) ? 6 : ((rand() % 3 == 0) ? 3 : 1));
+            } else {
+                make_entity_at(i, j, (rand() % 3 == 0) ? 3 : 1);
+            }
+        }
+    }
+
+    place_doors();
+
+    entity_spawn_lock = false;
+
+    return true;
+}
+
 bool generate_speedrun(void) {
     regen_on = true;
     timer_on = 5; // if no regen, use 18
-	
+
 	cha_x = S_WIDTH / 2;
     cha_y = S_HEIGHT / 2;
     entities.clear();
     enemies.clear();
-	
+
 	make_entity_at(cha_x - 1, cha_y - 1, 6);
     make_entity_at(cha_x, cha_y - 1, 6);
     make_entity_at(cha_x + 1, cha_y - 1, 6);
@@ -200,7 +235,7 @@ bool generate_speedrun(void) {
     make_entity_at(cha_x + 1, cha_y + 1, 6);
     make_entity_at(cha_x - 1, cha_y, 6);
     make_entity_at(cha_x + 1, cha_y, 6);
-	
+
 	for (int i = 0; i < S_WIDTH + 1; i++){
         for (int j = 0; j < S_HEIGHT + 1; j++){
             if ((i == 0 && j == 0) ||
@@ -215,24 +250,24 @@ bool generate_speedrun(void) {
             }
         }
     }
-	
+
 	make_entity_at(0, 0, 5);
     make_entity_at(S_WIDTH, 0, 5);
     make_entity_at(S_WIDTH, S_HEIGHT, 5);
     make_entity_at(0, S_HEIGHT, 5);
-	
+
 	return true;
 }
 
 bool generate_gridworld(void) {
     regen_on = true;
     timer_on = 10;
-	
+
 	cha_x = S_WIDTH / 2;
     cha_y = S_HEIGHT / 2;
     entities.clear();
     enemies.clear();
-	
+
 	for (int i = 0; i < S_WIDTH; i++){
         for (int j = 0; j < S_HEIGHT; j++){
             if (rand() % 4 == 0){
@@ -244,16 +279,16 @@ bool generate_gridworld(void) {
 	        }
         }
     }
-	
+
 	make_entity_at(0, 0, 5);
     make_entity_at(S_WIDTH, 0, 5);
     make_entity_at(S_WIDTH, S_HEIGHT, 5);
     make_entity_at(0, S_HEIGHT, 5);
-	
+
 	return true;
 }
 
-void generate_impossible(){
+bool generate_impossible(){
     regen_on = true;
     respawn_bomb_on = false;
     timer_on = -10; // if no regen, use 18
@@ -280,6 +315,8 @@ void generate_impossible(){
     place_ring_xyt(cha_x, cha_y, 3); // so that coins are on top
 
     place_doors();
+
+    return true;
 }
 
 bool generate_terrain(void){
@@ -591,26 +628,21 @@ void do_gen_next_level(void){
         generate_dense_terrain();
         break;
     case 10:
-        generate_boss();
+        //generate_boss();
+        generate_pacman_time();
         break;
     case 11:
     case 12:
         generate_gridworld();
         break;
     case 13:
-
+        generate_impossible();
         break;
     case 14:
+        generate_gridworld();
+        break;
     case 15:
-
-        break;
-    case 17:
-    case 18:
-    case 19:
-
-        break;
-    case 20:
-
+        generate_boss();
         break;
     default:
         generate_empty();
