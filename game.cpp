@@ -96,6 +96,126 @@ bool generate_empty(void){
 
     return true;
 }
+/*
+bool generate_maze(){
+    regen_on = false;
+    timer_on = -1;
+
+    entities.clear();
+    enemies.clear();
+
+    char* grid = NULL;
+    int w = S_WIDTH / 3;
+    int h = S_HEIGHT / 3;
+    grid = new char [h * w];
+
+    int stkadr = 0;
+    char* stk = new char [w + h];
+
+    // initalize
+    for (int i = 0; i < h * w; i++)
+        grid[i] = 0b00000000;
+
+    int cx = rand() % w;
+    int cy = rand() % h;
+
+    grid[cy * w + cx] = 0b10000001; // set checked and center flag
+
+    bool done = false;
+    while (!done){
+
+        // if unvisited neighbors
+            // choose an unvisited neighbors
+            // push current cell to stack
+            // remove wall betwen current cell and chosen one
+            // make chosen cell current cell
+        // else
+            // pop cell from stack and make it current
+
+        // if unvisited neighbors
+        if (!(grid[cy * w + cx] & BitLookup::BIT1) || // up (y--)
+            !(grid[cy * w + cx] & BitLookup::BIT2) || // right (x++)
+            !(grid[cy * w + cx] & BitLookup::BIT3) || // down (y++)
+            !(grid[cy * w + cx] & BitLookup::BIT4)){ // left (x--);
+
+            // pick direction
+            int dir = -1;
+            while (1) {
+                dir = rand() % 4 + 1;
+                if (!(grid[cy * w + cx] & (1 << dir))) { // if the dirth bit is unset
+                    break;
+                }
+            }
+
+            // check bounds
+            if (dir == 1 && cy - 1 < 0) continue;
+            if (dir == 4 && cx - 1 < 0) continue;
+            if (dir == 2 && cx + 1 >= 2) continue;
+            if (dir == 3 && cy + 1 >= 2) continue;
+
+            // push onto stack
+            stk[stkadr++] = grid[cy * w + cx];
+
+            // remove wall between cells
+            switch (dir) {
+            case 1:
+                grid[cy * w + cx] |= BitLookup::BIT1;
+                grid[(cy - 1) * w + cx] |= BitLookup::BIT3; // set cell up
+                cy--;
+                break;
+            case 2:
+                grid[cy * w + cx] |= BitLookup::BIT2;
+                grid[cy * w + (cx + 1)] |= BitLookup::BIT4;
+                cx++;
+                break;
+            case 3:
+                grid[cy * w + cx] |= BitLookup::BIT3;
+                grid[(cy + 1) * w + cx] |= BitLookup::BIT1;
+                cy++;
+                break;
+            case 4:
+                grid[cy * w + cx] |= BitLookup::BIT4;
+                grid[cy * w + (cx - 1)] |= BitLookup::BIT2;
+                cx++;
+                break;
+            default:
+                std::cout << "invalid dir!" << std::endl;
+            }
+
+            grid[cy * w + cx] |= BitLookup::BIT7;
+
+        } else {
+
+        }
+
+        // check if unvisited cells
+        for (int i = 0; i < h * w; i++){
+            if (!(grid[i] & BitLookup::BIT7)){
+                done = false; break;
+            }
+        }
+    }
+
+    // convert to entities
+    for (int x = 0; x < w; x++){
+        for (int y = 0; y < h; y++){
+            make_entity_at(3 * x, 3 * y, 4);
+            make_entity_at(3 * x + 2, 3 * y, 4);
+            make_entity_at(3 * x, 3 * y + 2, 4);
+            make_entity_at(3 * x + 2, 3 * y + 2, 4);
+
+            if (!(grid[y * w + x] & BitLookup::BIT0)) make_entity_at((3 * x) + 1, (3 * y) + 1, 4);
+
+            if (!(grid[y * w + x] & BitLookup::BIT1)) make_entity_at((3 * x) + 1, (3 * y), 4);
+            if (!(grid[y * w + x] & BitLookup::BIT2)) make_entity_at((3 * x), (3 * y) + 1, 4);
+            if (!(grid[y * w + x] & BitLookup::BIT3)) make_entity_at((3 * x) + 2, (3 * y) + 1, 4);
+            if (!(grid[y * w + x] & BitLookup::BIT4)) make_entity_at((3 * x) + 1, (3 * y) + 2, 4);
+        }
+    }
+
+    return true;
+}
+*/
 
 bool generate_tutorial(void){
     regen_on = false;
@@ -610,7 +730,6 @@ void do_gen_next_level(void){
     case 1:
     case 2:
         generate_terrain();
-//        generate_gridworld();
         break;
     case 3:
         generate_safe_run();
@@ -642,6 +761,58 @@ void do_gen_next_level(void){
         generate_gridworld();
         break;
     case 15:
+    case 16:
+    case 17:
+        generate_terrain();
+        break;
+    case 19:
+        break;
+    case 20:
+    case 21:
+    case 22:
+        break;
+    case 23:
+        break;
+    case 24:
+    case 25:
+    case 26:
+        break;
+    case 27:
+        break;
+    case 28:
+    case 29:
+    case 30:
+        break;
+    case 31:
+        break;
+    case 32:
+    case 33:
+    case 34:
+        break;
+    case 35:
+        break;
+    case 36:
+    case 37:
+    case 38:
+        break;
+    case 39:
+        break;
+    case 40:
+    case 41:
+    case 42:
+        break;
+    case 43:
+        break;
+    case 44:
+    case 45:
+    case 46:
+        break;
+    case 47:
+        break;
+    case 48:
+    case 49:
+        break;
+    case 50:
         generate_boss();
         break;
     default:
@@ -652,6 +823,14 @@ void do_gen_next_level(void){
     cha_x = S_WIDTH / 2;
     cha_y = S_HEIGHT / 2;
     player_set_safe(); // go to safe location
+
+    // correct laser enemies
+    for (int i = 0; i < enemies.size(); i++){
+        if (enemies[i]._t != 2 && enemies[i]._t != 3) continue;
+
+        if (enemies[i]._x == cha_x) enemies[i]._x--;
+        if (enemies[i]._y == cha_y) enemies[i]._y++;
+    }
 
     do_level_screen(level);
 

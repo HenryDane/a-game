@@ -71,7 +71,7 @@ int main(){
 
     update_sound();
 
-    decrease_volume(100);
+    //decrease_volume(100);
 
     while (window.isOpen()) {
         //clear the screen

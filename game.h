@@ -11,6 +11,7 @@ bool generate_gridworld(void);
 bool generate_speedrun(void);
 bool generate_impossible(void);
 bool generate_pacman_time(void);
+bool generate_maze(void);
 
 bool player_set_safe(void);
 bool make_entity_at(int x, int y, int t);
