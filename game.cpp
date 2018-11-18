@@ -96,7 +96,7 @@ bool generate_empty(void){
 
     return true;
 }
-/*
+
 bool generate_maze(){
     regen_on = false;
     timer_on = -1;
@@ -215,7 +215,6 @@ bool generate_maze(){
 
     return true;
 }
-*/
 
 bool generate_tutorial(void){
     regen_on = false;
