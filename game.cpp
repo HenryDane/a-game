@@ -77,6 +77,7 @@ bool make_entity_at(int x, int y, int t){
     return true;
 }
 
+
 bool player_set_safe(void){
     // go to safe space
     for (unsigned int i = 0; i < entities.size(); i++){
@@ -182,7 +183,6 @@ void do_gen_next_level(void){
     case 1:
     case 2:
         generate_terrain();
-//        generate_gridworld();
         break;
     case 3:
         generate_safe_run();
@@ -217,6 +217,58 @@ void do_gen_next_level(void){
         generate_gridworld();
         break;
     case 15:
+    case 16:
+    case 17:
+        generate_terrain();
+        break;
+    case 19:
+        break;
+    case 20:
+    case 21:
+    case 22:
+        break;
+    case 23:
+        break;
+    case 24:
+    case 25:
+    case 26:
+        break;
+    case 27:
+        break;
+    case 28:
+    case 29:
+    case 30:
+        break;
+    case 31:
+        break;
+    case 32:
+    case 33:
+    case 34:
+        break;
+    case 35:
+        break;
+    case 36:
+    case 37:
+    case 38:
+        break;
+    case 39:
+        break;
+    case 40:
+    case 41:
+    case 42:
+        break;
+    case 43:
+        break;
+    case 44:
+    case 45:
+    case 46:
+        break;
+    case 47:
+        break;
+    case 48:
+    case 49:
+        break;
+    case 50:
         generate_boss();
         break;
     default:
@@ -227,6 +279,14 @@ void do_gen_next_level(void){
     cha_x = S_WIDTH / 2;
     cha_y = S_HEIGHT / 2;
     player_set_safe(); // go to safe location
+
+    // correct laser enemies
+    for (int i = 0; i < enemies.size(); i++){
+        if (enemies[i]._t != 2 && enemies[i]._t != 3) continue;
+
+        if (enemies[i]._x == cha_x) enemies[i]._x--;
+        if (enemies[i]._y == cha_y) enemies[i]._y++;
+    }
 
     do_level_screen(level);
 
