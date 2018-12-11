@@ -83,4 +83,6 @@ int handle_key(sf::Keyboard::Key k);
 
 extern sf::RenderTexture renderTexture;
 
+extern int gen_idx;
+
 extern char __NL;

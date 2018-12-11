@@ -1,7 +1,26 @@
+#include <SFML/Graphics.hpp>
 #include "main.h"
 #include "patch.h"
 #include "display.h"
 #include "audio.h"
+
+/*
+sf::Sprite lvlbgs;
+sf::RenderTexture lvlbg;
+
+void setup_lvlbg(void){
+    sf::Sprite sprite1;
+    sprite1.setTexture(textures.at(WALL_ENTITY_TEX));
+    sprite1.setScale(TEX_SCALE * 3, TEX_SCALE * 3); // (128 / 4) = 32
+
+    for (int x = 0; x < S_WIDTH; x++){
+        for (int y = 0; y < S_HEIGHT; y++){
+            sprite1.setPosition(x * TILE_WIDTH, y * TILE_WIDTH);
+            lvlbg.draw(sprite1);
+        }
+    }
+}
+*/
 
 void draw_tutorial_level_text(void){
     jumptex_xyt(0, 2, "Press 't' to skip this tutorial");
@@ -10,18 +29,23 @@ void draw_tutorial_level_text(void){
         jumptex_xyt(0, 9, "Use WASD to move");
     }
     if (cha_x > 25) {
-        jumptex_xyt(20, 10, "Avoid walls '#' ");
+        jumptex_xyt(20, 10, "Avoid walls");
+        //jumpwr_xyt(33, 10, WALL_ENTITY_TEX);
     }
     if (cha_x > 45) {
-        jumptex_xyt(40, 11, "Collect '+' tokens for +1 score");
-        jumptex_xyt(45, 12, "Collect '$' tokens for +5 score");
+        jumptex_xyt(40, 11, "Collect plus tokens for +1 score");
+        //jumpwr_xyt(49, 11, PLUS_ENTITY_TEX);
+        jumptex_xyt(45, 12, "Collect coin tokens for +5 score");
+        //jumpwr_xyt(54, 12, COIN_ENTITY_TEX);
     }
     if (cha_x > 55) {
-        jumptex_xyt(50, 16, "Avoid '!' bombs. They have a radius of 2.");
+        jumptex_xyt(50, 16, "Avoid bombs. They have a radius of 2.");
+        //jumpwr_xyt(57, 16, BOMB_ENTITY_TEX);
         jumptex_xyt(55, 17, "They do damage of -10 to your score.");
     }
     if (cha_x > 65) {
-        jumptex_xyt(60, 20, "Enemies 'O' subtract 200 from your score.");
+        jumptex_xyt(60, 20, "Enemies subtract 200 from your score.");
+        //jumpwr_xyt(69, 20, ENEMY_TEX);
     }
 
     if (cha_x > 75) {
@@ -29,7 +53,8 @@ void draw_tutorial_level_text(void){
         jumptex_xyt(0, 5, "Press 'q' to activate your shield and protect yourself from bombs (only works if your score is above ten).");
         jumptex_xyt(0, 6, "Press 'e' to use a grenade on surrounding enemies (only works if your score is above five).");
 
-        jumptex_xyt(0, 24, "Doors 'D' take you to the next level.");
+        jumptex_xyt(0, 24, "Doors take you to the next level.");
+        //jumpwr_xyt(7, 24, DOOR_ENTITY_TEX);
         jumptex_xyt(0, 25, "Game over occurs when your score is less than -20. Don't let it get that low.");
 
         jumptex_xyt(0, 27, "Good night, and good luck.");
@@ -39,10 +64,22 @@ void draw_tutorial_level_text(void){
 void draw_gfx(void) {
     if (level == 0)  draw_tutorial_level_text();
 
+/*    const sf::Texture& lvlbgtx = lvlbg.getTexture();
+    lvlbgs.setTexture(lvlbgtx);
+    renderTexture.draw(lvlbgs); */
+
     for (int i = 0; i < particles.size(); i++){
-        int t = EXPLOSION_TEX;
-        if (particles[i].type == 1) t = HLASER_BEAM_TEX;
-        if (particles[i].type == 2) t = VLASER_BEAM_TEX;
+        if (particles[i].x < 0 || particles[i].y < 0) continue;
+
+        int t = -1;
+
+        switch(particles[i].type) {
+        case 1: t = HLASER_BEAM_TEX; break;
+        case 2: t = VLASER_BEAM_TEX; break;
+        case 4: t = VLASER_PRE_BEAM_TEX; break;
+        case 3: t = HLASER_PRE_BEAM_TEX; break;
+        default: t = EXPLOSION_TEX; break;
+        }
 
         jumpwr_xyt(particles[i].x, particles[i].y + 2, t);
     }
@@ -156,6 +193,7 @@ void draw_level_screen(int lvl){
     case 1:
     case 2:
         text.setString("Patience is a virtue");
+        break;
     case 3:
     case 12:
         text.setString("Collect time tokens to avoid dying by the clock!");
@@ -248,4 +286,110 @@ void draw_win_screen(void){
     text.setPosition(((S_WIDTH + 1) * 16 - b.width) / 2, ((S_HEIGHT + 3) * 16 - b.height) / 2 + 75);
 
     renderTexture.draw(text);
+}
+
+void draw_main_menu(){
+    sf::Text text;
+    text.setString("a_game");
+    //text.setPosition(10,10);
+    text.setCharacterSize(50);
+    text.setColor(sf::Color(255, 255, 255)); // todo animate colors
+    text.setFont(font);
+
+    // center text
+    sf::FloatRect b = text.getLocalBounds();
+    text.setPosition(0, ((S_HEIGHT + 3) * 16) / 2 - b.height);
+
+    renderTexture.draw(text);
+
+    if (gen_idx == 0) {
+        text.setString("-------------NEW");
+        text.setColor(sf::Color(255, 255, 255));
+    } else {
+        text.setString("NEW");
+        text.setColor(sf::Color(0, 255, 0));
+    }
+    text.setCharacterSize(25);
+    b = text.getLocalBounds();
+    text.setPosition((S_WIDTH * 16) - b.width, ((S_HEIGHT + 3) * 16) / 2 - b.height - 75); //50
+    renderTexture.draw(text);
+
+    if (gen_idx == 1) {
+        text.setString("------------LOAD");
+        text.setColor(sf::Color(255, 255, 255));
+    } else {
+        text.setString("LOAD");
+        text.setColor(sf::Color(0, 255, 0));
+    }
+    b = text.getLocalBounds();
+    text.setPosition((S_WIDTH * 16) - b.width, ((S_HEIGHT + 3) * 16) / 2 - b.height - 50); // 75
+    renderTexture.draw(text);
+
+    if (gen_idx == 2) {
+        text.setString("------------SAVE");
+        text.setColor(sf::Color(255, 255, 255));
+    } else {
+        text.setString("SAVE");
+        text.setColor(sf::Color(0, 255, 0));
+    }
+    b = text.getLocalBounds();
+    text.setPosition((S_WIDTH * 16) - b.width, ((S_HEIGHT + 3) * 16) / 2 - b.height - 25); //100
+    renderTexture.draw(text);
+
+    if (gen_idx == 3) {
+        text.setString("-----------LEVEL");
+        text.setColor(sf::Color(255, 255, 255));
+    } else {
+        text.setString("LEVEL");
+        text.setColor(sf::Color(0, 255, 0));
+    }
+    b = text.getLocalBounds();
+    text.setPosition((S_WIDTH * 16) - b.width, ((S_HEIGHT + 3) * 16) / 2 - b.height); //125
+    renderTexture.draw(text);
+
+    if (gen_idx == 4) {
+        text.setString("----------CREDIT");
+        text.setColor(sf::Color(255, 255, 255));
+    } else {
+        text.setString("CREDIT");
+        text.setColor(sf::Color(0, 255, 0));
+    }
+    b = text.getLocalBounds();
+    text.setPosition((S_WIDTH * 16) - b.width, ((S_HEIGHT + 3) * 16) / 2 - b.height + 25); //150
+    renderTexture.draw(text);
+
+    if (gen_idx == 5) {
+        text.setString("---------OPTIONS");
+        text.setColor(sf::Color(255, 255, 255));
+    } else {
+        text.setString("OPTIONS");
+        text.setColor(sf::Color(0, 255, 0));
+    }
+    b = text.getLocalBounds();
+    text.setPosition((S_WIDTH * 16) - b.width, ((S_HEIGHT + 3) * 16) / 2 - b.height + 50); //175
+    renderTexture.draw(text);
+}
+
+void draw_new_game(){
+
+}
+
+void draw_load_game(){
+
+}
+
+void draw_save_game(){
+
+}
+
+void draw_level_select(){
+
+}
+
+void draw_credits(){
+
+}
+
+void draw_options(){
+
 }

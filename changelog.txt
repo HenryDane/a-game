@@ -1,3 +1,8 @@
+v0.3.next
+- fixed explosion over text issues [#19]
+- moved todo section to github [meta]
+- fixed level text issue
+
 v0.3.0005
 - restyled screens
 - added more levels
@@ -9,12 +14,6 @@ v0.3.0000
 - added music and loops
 - multiple small fixes
 - bugfixes
-
-v0.3.todo
-- restart level option
-- game saves
-- animation of sprite transitions
-- use sprites properly
 
 v0.2.0000
 - fixed tutorial drawing

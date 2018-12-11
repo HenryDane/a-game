@@ -14,12 +14,14 @@
 #define EXPLOSION_TEX 10
 #define VLASER_BEAM_TEX 11
 #define HLASER_BEAM_TEX 12
+#define VLASER_PRE_BEAM_TEX 17
+#define HLASER_PRE_BEAM_TEX 16
 
 #define CHAR_TEX 13
 
 #define FLOOR_TEX 14
 
-#define NUM_TEX_FILES 16
+#define NUM_TEX_FILES 18
 
 #include <SFML/Graphics.hpp>
 #include <vector>
