@@ -12,7 +12,6 @@
 
 #define __S(x) patch::to_string(x)
 
-/*
 enum BitLookup {
     BIT0 = 1 << 0,
     BIT1 = 1 << 1,
@@ -23,7 +22,6 @@ enum BitLookup {
     BIT6 = 1 << 6,
     BIT7 = 1 << 7
 };
-*/
 
 struct entity_t {
     int x;
