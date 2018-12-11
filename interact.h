@@ -20,4 +20,6 @@ bool update_object (int id, int dx, int dy);
 
 bool damage_object_x(int x, int dmg);
 bool damage_object_y(int y, int dmg);
+void vertical_beam(int x);
+void horizontal_beam(int x);
 void place_explosion(int x, int y, int r);

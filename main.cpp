@@ -14,6 +14,7 @@
 #include "tex_print.h"
 #include "draw.h"
 #include "audio.h"
+#include "level.h"\
 
 // globals lol
 int cha_x = S_WIDTH / 2;
@@ -35,8 +36,55 @@ bool entity_spawn_lock = false; // flag for deleting everything nearby
 bool entity_overlap_check_on = false; // prevent overlap spawn
 bool respawn_bomb_on = true;
 
+// menu shenanigans
+int gen_idx = 0;
+int gen_idx_ulim = 7; // exclusive
+
 // GAME STATE
 int state = 0;
+/*
+    NOW:
+        S0 : title screen
+         key ' ' -> S3
+        S1 : normal game
+         key WASD/Q/E, etc -> game
+         lvl door -> S2
+        S2 : level screen
+         key ' ' -> S1
+        S3 : pretutorial
+         key ' ' -> S1
+
+    TODO:
+        S0 : title
+         key ' ' -> S10
+        S1 : normal
+        S2 : level
+         lvl door -> S2
+        S3 : pretutorial [remove?]
+         key ' ' -> S1
+
+        S10 : main menu
+        S11 : new game
+         key ' ' -> S3
+        S12 : load / save game
+         { see key handler } -> save|load|back|resume
+         { various } -> S1|S10
+        S14 : level select
+         { see key handler }
+        S15 : options
+         { see key handler }
+        S16 : credits
+         key ' ' -> S10
+
+        S* : any/all
+         death -> S4
+
+        S4 : death [verify]
+         * -> S14
+        S5 : win [verify]
+         * -> S15
+
+*/
 
 // newline
 char __NL = 10;
@@ -53,6 +101,8 @@ int main(){
 
     // generate render texture
     if (!renderTexture.create((S_WIDTH + 1) * TILE_WIDTH, (S_HEIGHT + 3) * TILE_WIDTH)) return 1000;
+
+    std::cout << window.getSize().x << "," << window.getSize().y << std::endl;
 
     // initalize textures
     init_display();
@@ -93,7 +143,7 @@ int main(){
                     return 0;
                 } else if (event.key.code == sf::Keyboard::Tab) {
                     //std::cout << music.getPlayingOffset().asSeconds() << " | " << music.getDuration().asSeconds() << std::endl;
-                    //score += 1000;
+                    score += 1000;
                 } else if (event.key.code == sf::Keyboard::Tilde) {
                     skip_seconds(30);
                 } else if (event.key.code == sf::Keyboard::LBracket) { // '['
@@ -102,6 +152,18 @@ int main(){
                     increase_volume(20);
                 } else if (event.key.code == sf::Keyboard::BackSlash) {
                     skip_current_song();
+                } else if (event.key.code == sf::Keyboard::Add) {
+                    state++;
+                } else if (event.key.code == sf::Keyboard::Subtract) {
+                    state--;
+                } else if (event.key.code == sf::Keyboard::Enter) {
+                    std::cout << "State: " << state << std::endl;
+                } else if (event.key.code == sf::Keyboard::Numpad8 ||
+                           event.key.code == sf::Keyboard::Up) {
+                    gen_idx--;
+                } else if (event.key.code == sf::Keyboard::Numpad2 ||
+                           event.key.code == sf::Keyboard::Down) {
+                    gen_idx++;
                 }
 
                 switch (state) {
@@ -129,6 +191,21 @@ int main(){
                         window.close();
                         return 0;
                     }
+                    break;
+                case 10: // main menu
+                    break;
+                case 11: // new game
+                    break;
+                case 12: // load game
+                    break;
+                case 13: // save game
+                    break;
+                case 14: // level select
+                    break;
+                case 15: // credits
+                    break;
+                case 16: // options
+                    break;
                 default:
                     std::cout << "bad state!" << std::endl;
                     break;
@@ -155,6 +232,27 @@ int main(){
             break;
         case 5:
             draw_win_screen();
+            break;
+        case 10: // main menu
+            draw_main_menu();
+            break;
+        case 11: // new game
+            draw_new_game();
+            break;
+        case 12: // load game
+            draw_load_game();
+            break;
+        case 13: // save game
+            draw_save_game();
+            break;
+        case 14: // level select
+            draw_level_select();
+            break;
+        case 15: // credits
+            draw_credits();
+            break;
+        case 16: // options
+            draw_options();
             break;
         default:
             break;
@@ -266,10 +364,10 @@ int handle_key(sf::Keyboard::Key k){
     if (timer_on > 0) timer_on --;
 
     // handle timer
-    if (timer_on == 0 && level == 15){
+    if (timer_on == 0 && level == 25){
         //do_win_screen();
         make_entity_at(S_WIDTH / 2, S_HEIGHT / 2, 100);
-    } else if (timer_on == 0 && level != 15) {
+    } else if (timer_on == 0 && level != 25) {
         score -= 1000;
     }
 

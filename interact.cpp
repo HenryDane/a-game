@@ -181,7 +181,6 @@ bool update_object (int id, int dx, int dy){
 }
 
 bool damage_object_x(int x, int dmg) {
-    //if (x > S_WIDTH) return false;
     for (unsigned int i = 0; i < registry.size(); i++){
         int x1 = -1;
         int y1 = -1;
@@ -202,12 +201,6 @@ bool damage_object_x(int x, int dmg) {
         }
     }
 
-    /*set_color(color_t::BRIGHT_RED);
-    for (int i = 0; i <= S_HEIGHT; i++){
-        jump_xy(x, i + 2);
-        std::cout << "#";
-    }
-    set_color(color_t::NORMAL);*/
     for (int i = 0; i <= S_WIDTH; i++){
         particle_t p;
         p.x = x;
@@ -221,7 +214,6 @@ bool damage_object_x(int x, int dmg) {
 }
 
 bool damage_object_y(int y, int dmg) {
-    //if (y >= S_HEIGHT) return false;
     for (unsigned int i = 0; i < registry.size(); i++){
         int x1 = -1;
         int y1 = -1;
@@ -242,14 +234,6 @@ bool damage_object_y(int y, int dmg) {
         }
     }
 
-    /*
-    set_color(color_t::BRIGHT_RED);
-    for (int i = 0; i <= S_WIDTH; i++){
-        jump_xy(i, y + 2);
-        std::cout << "#";
-    }
-    set_color(color_t::NORMAL);particles.push_back(p);
-    */
     for (int i = 0; i <= S_WIDTH; i++){
         particle_t p;
         p.x = i;
@@ -260,4 +244,26 @@ bool damage_object_y(int y, int dmg) {
     }
 
     return true;
+}
+
+void horizontal_beam(int x) {
+    for (int i = 0; i <= S_WIDTH; i++){
+        particle_t p;
+        p.x = x;
+        p.y = i;
+        p.ttl = 1;
+        p.type = 4; // pre
+        particles.push_back(p);
+    }
+}
+
+void vertical_beam(int y) {
+    for (int i = 0; i <= S_WIDTH; i++){
+        particle_t p;
+        p.x = i;
+        p.y = y;
+        p.ttl = 1;
+        p.type = 3; // pre
+        particles.push_back(p);
+    }
 }
