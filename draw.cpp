@@ -241,8 +241,20 @@ void draw_level_screen(int lvl){
     case 15:
         text.setString("Here's the tutorial again. Why do you even trust me?");
         break;
+    case 16:
+        text.setString("I hate making flavor text.");
+        break;
+    case 17:
+        text.setString("This is level 17.");
+        break;
+    case 18:
+        text.setString("... and this is level 18.");
+        break;
+    case 19:
+        text.setString("Stay alive. When the timer runs out, get to the door.");
+        break;
     default:
-        text.setString("How'd you get to this level?");
+        text.setString("How did you get to this level?");
         break;
     }
 
