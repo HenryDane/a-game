@@ -122,7 +122,7 @@ int main(){
 
     update_sound();
 
-    //decrease_volume(100);
+    decrease_volume(100);
 
     while (window.isOpen()) {
         //clear the screen
@@ -204,7 +204,8 @@ int main(){
                     break;
                 case 10: // main menu
                     if (event.key.code == sf::Keyboard::Right ||
-                        event.key.code == sf::Keyboard::Numpad6) {
+                        event.key.code == sf::Keyboard::Numpad6 ||
+                        event.key.code == sf::Keyboard::D) {
                         switch (gen_idx) {
                             case 0: state = 11; break;
                             case 1: state = 12; break;
@@ -222,31 +223,37 @@ int main(){
                     break;
                 case 12: // load game
                     if (event.key.code == sf::Keyboard::Right ||
-                        event.key.code == sf::Keyboard::Numpad6) {
+                        event.key.code == sf::Keyboard::Numpad6 ||
+                        event.key.code == sf::Keyboard::D) {
                         load_game(gen_idx);
                         state = 17;
                     } else if (event.key.code == sf::Keyboard::Left ||
-                        event.key.code == sf::Keyboard::Numpad4) {
+                        event.key.code == sf::Keyboard::Numpad4 ||
+                        event.key.code == sf::Keyboard::A) {
                         state = 10;
                     }
                     break;
                 case 13: // save game
                     if (event.key.code == sf::Keyboard::Right ||
-                        event.key.code == sf::Keyboard::Numpad6) {
+                        event.key.code == sf::Keyboard::Numpad6 ||
+                        event.key.code == sf::Keyboard::D) {
                         save_game(gen_idx);
                         state = 18; // game saved
                     } else if (event.key.code == sf::Keyboard::Left ||
-                        event.key.code == sf::Keyboard::Numpad4) {
+                        event.key.code == sf::Keyboard::Numpad4 ||
+                        event.key.code == sf::Keyboard::A) {
                         state = 10;
                     }
                     break;
                 case 14: // level select
                     if (event.key.code == sf::Keyboard::Right ||
-                        event.key.code == sf::Keyboard::Numpad6) {
+                        event.key.code == sf::Keyboard::Numpad6 ||
+                        event.key.code == sf::Keyboard::D) {
                         select_load_level(gen_idx);
                         state = 2; // press any key to begin selected level
                     } else if (event.key.code == sf::Keyboard::Left ||
-                        event.key.code == sf::Keyboard::Numpad4) {
+                        event.key.code == sf::Keyboard::Numpad4 ||
+                        event.key.code == sf::Keyboard::A) {
                         state = 10;
                     }
                     break;
@@ -257,7 +264,8 @@ int main(){
                     // TODO (add main menu option)
                     // TODO (add resume game option (only if there is a valid game ready))
                     if (event.key.code == sf::Keyboard::Left ||
-                        event.key.code == sf::Keyboard::Numpad4) {
+                        event.key.code == sf::Keyboard::Numpad4 ||
+                        event.key.code == sf::Keyboard::A) {
                         state = 10;
                     }
                     break;
@@ -266,10 +274,12 @@ int main(){
                     break;
                 case 18: // game saved
                     if (event.key.code == sf::Keyboard::Right ||
-                        event.key.code == sf::Keyboard::Numpad6) {
+                        event.key.code == sf::Keyboard::Numpad6 ||
+                        event.key.code == sf::Keyboard::D) {
                         state = 13;
                     } else if (event.key.code == sf::Keyboard::Left ||
-                        event.key.code == sf::Keyboard::Numpad4) {
+                        event.key.code == sf::Keyboard::Numpad4 ||
+                        event.key.code == sf::Keyboard::A) {
                         state = 10;
                     }
                     break;

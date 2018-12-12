@@ -289,6 +289,37 @@ void do_new_game() {
 }
 
 void load_game(int slot) {
+    bool debug = false;
+
+    // clean up lists
+    registry.clear();
+    enemies.clear();
+    entities.clear();
+    particles.clear();
+
+    // set up variables
+    cha_x = S_WIDTH / 2;
+    cha_y = S_HEIGHT / 2;
+    score = 5;
+    global_score = 0;
+    level = 0;
+    shield = -1002; // signals first turn
+    turns = 0;
+
+    // reset flags
+    regen_on = true; // do entities regen?
+    timer_on = -1; // if >= 0 timer is on
+    // dots_on = false; // flag for dots display
+    entity_spawn_lock = false; // flag for deleting everything nearby
+    entity_overlap_check_on = false; // prevent overlap spawn
+    respawn_bomb_on = true;
+
+    // set up lists
+    init_registry();
+    entities.reserve(100);
+    enemies.reserve(30);
+    particles.reserve(100);
+
     std::fstream file;
     file.open("slot" + patch::to_string(slot), std::ios::in);
     if (!file.is_open()) {
@@ -308,16 +339,19 @@ void load_game(int slot) {
     }
 
     // read variables
-    file >> cha_x >> cha_y >> score >> global_score >> level >> shield >> turns;
+    file >> cha_x >> cha_y >> score >> global_score >> level >> shield >> turns >> global_uuid_next;
 
     // read flags
     file >> regen_on >> timer_on >> entity_spawn_lock >> entity_overlap_check_on >> respawn_bomb_on;
+
+    register_object(0, 2, 0, 0); // register player
 
     // read registry
     file >> t_size;
     for (int i = 0 ; i < t_size; i++){
         registry_key_t rkt_t;
         file >> t_idx >> rkt_t.id >> rkt_t.ridx >> rkt_t.rtype >> rkt_t.type;
+        if (debug) std::cout << "Loaded registry key " << t_idx << std::endl;
         registry.push_back(rkt_t);
     }
 
@@ -326,6 +360,7 @@ void load_game(int slot) {
     for (int i = 0 ; i < t_size; i++){
         enemy_t e_t;
         file >> t_idx >> e_t._id >> e_t._score >> e_t._state >> e_t._t >> e_t._x >> e_t._y;
+        if (debug) std::cout << "Loaded enemy " << t_idx << std::endl;
         enemies.push_back(e_t);
     }
 
@@ -334,6 +369,7 @@ void load_game(int slot) {
     for (int i = 0 ; i < t_size; i++){
         entity_t e_t;
         file >> t_idx >> e_t.t >> e_t.x >> e_t.y;
+        if (debug) std::cout << "Loaded entity " << t_idx << std::endl;
         entities.push_back(e_t);
     }
 
@@ -342,6 +378,7 @@ void load_game(int slot) {
     for (int i = 0 ; i < t_size; i++){
         particle_t p_t;
         file >> t_idx >> p_t.ttl >> p_t.type >> p_t.x >> p_t.y;
+        if (debug) std::cout << "Loaded particle " << t_idx << std::endl;
         particles.push_back(p_t);
     }
 
@@ -354,9 +391,50 @@ void load_game(int slot) {
     }
 
     file >> tmp;
-    std::cout << tmp;
+    if (debug) std::cout << tmp;
 
     file.close();
+
+    // PRINT
+    if (debug) {
+        std::cout << "=========SLOT" << slot << "=========" << std::endl;
+
+        // write globals
+        std::cout << cha_x << " " << cha_y << " " << score << " " << global_score << " " << level << " " << shield << " " << turns << " " << global_uuid_next << " " << std::endl;
+
+        // write flags
+        std::cout << regen_on << " " << timer_on << " " << entity_spawn_lock << " " << entity_overlap_check_on << " " << respawn_bomb_on << " " << std::endl;
+
+        // write registry
+        std::cout << registry.size() << std::endl;
+        for (int i = 0; i < registry.size(); i++) {
+            std::cout << i << " " << registry[i].id << " " << registry[i].ridx << " " << registry[i].rtype << " " << registry[i].type << " " << std::endl;
+        }
+
+        // write enemies
+        std::cout << enemies.size() << std::endl;
+        for (int i = 0; i < enemies.size(); i++) {
+            std::cout << i << " " << enemies[i]._id << " " << enemies[i]._score << " " << enemies[i]._state << " " << enemies[i]._t << " " << enemies[i]._x << " " << enemies[i]._y << " " << std::endl;
+        }
+
+        // write entities
+        std::cout << entities.size() << std::endl;
+        for (int i = 0; i < entities.size(); i++) {
+            std::cout << i << " " << entities[i].t << " " << entities[i].x << " " << entities[i].y << " " << std::endl;
+        }
+
+        // write particles
+        std::cout << particles.size() << std::endl;
+        for(int i = 0; i < particles.size(); i++){
+            std::cout << i << " " << particles[i].ttl << " " << particles[i].type << " " << particles[i].x << " " << particles[i].y << " " << std::endl;
+        }
+
+        std::cout << "[END] [END] [END] [END]" << std::endl;
+
+        std::cout << "=========SLOTEND=========" << std::endl;
+    }
+
+    std::cout << "Done loading." << std::endl;
 }
 
 void save_game(int slot) {
@@ -374,8 +452,8 @@ void save_game(int slot) {
     if (debug) std::cout << "=========SLOT" << slot << "=========" << std::endl;
 
     // write globals
-    file << cha_x << " " << cha_y << " " << score << " " << global_score << " " << level << " " << shield << " " << turns << " " << std::endl;
-    if (debug) std::cout << cha_x << " " << cha_y << " " << score << " " << global_score << " " << level << " " << shield << " " << turns << " " << std::endl;
+    file << cha_x << " " << cha_y << " " << score << " " << global_score << " " << level << " " << shield << " " << turns << " " << global_uuid_next << " " << std::endl;
+    if (debug) std::cout << cha_x << " " << cha_y << " " << score << " " << global_score << " " << level << " " << shield << " " << turns << " " << global_uuid_next << " " << std::endl;
 
     // write flags
     file << regen_on << " " << timer_on << " " << entity_spawn_lock << " " << entity_overlap_check_on << " " << respawn_bomb_on << " " << std::endl;
