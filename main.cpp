@@ -36,6 +36,7 @@ bool entity_overlap_check_on = false; // prevent overlap spawn
 bool respawn_bomb_on = true;
 bool debug = false;
 bool cheats = false;
+bool game_session_valid = false;
 
 // menu shenanigans
 int gen_idx = 0;
@@ -155,6 +156,7 @@ int main(){
                     break;
                 case 5:
                 case 4:
+                    game_session_valid = false;
                     if (event.key.code == sf::Keyboard::Space) {
                         //window.close();
                         //return 0;
@@ -174,13 +176,19 @@ int main(){
                                 gen_idx = level;
                                 break;
                             case 4: state = 15; break;
-                            case 5: state = 16; break;
+                            case 6: state = 16; break;
+                            case 5:
+                                if (game_session_valid) state = 1;
+                                break;
                             default: break;
                         }
+                    } else if (event.key.code == sf::Keyboard::H) {
+                        state = 20;
                     }
                     break;
                 case 11: // new game
                     // any key to start
+                    game_session_valid = true;
                     do_new_game();
                     break;
                 case 12: // load game
@@ -215,6 +223,7 @@ int main(){
                     } else if (event.key.code == sf::Keyboard::Left ||
                         event.key.code == sf::Keyboard::Numpad4 ||
                         event.key.code == sf::Keyboard::A) {
+                        gen_idx = 3;
                         state = 10;
                     }
                     break;
@@ -272,12 +281,16 @@ int main(){
                         state = 10;
                     }
                     break;
+                case 20:
+                    if (event.key.code == sf::Keyboard::Space) {
+                        state = 10;
+                    }
+                    break;
                 default:
                     std::cout << "bad state!" << std::endl;
                     break;
                 }
             }
-
 		}
 
 		// draw
@@ -300,34 +313,34 @@ int main(){
             draw_win_screen();
             break;
         case 10: // main menu
-            if (gen_idx < 0) gen_idx = 0;
-            if (gen_idx > 5) gen_idx = 5;
+            if (gen_idx < 0) gen_idx = 6;
+            if (gen_idx > 6) gen_idx = 0;
             draw_main_menu();
             break;
         case 11: // new game
             draw_new_game();
             break;
         case 12: // load game
-            if (gen_idx < 0) gen_idx = 0;
-            if (gen_idx > 5) gen_idx = 5;
+            if (gen_idx < 0) gen_idx = 5;
+            if (gen_idx > 5) gen_idx = 0;
             draw_load_game();
             break;
         case 13: // save game
-            if (gen_idx < 0) gen_idx = 0;
-            if (gen_idx > 5) gen_idx = 5;
+            if (gen_idx < 0) gen_idx = 5;
+            if (gen_idx > 5) gen_idx = 0;
             draw_save_game();
             break;
         case 14: // level select
-            if (gen_idx < 0) gen_idx = 0;
-            if (gen_idx > 19) gen_idx = 19;
+            if (gen_idx < 0) gen_idx = 19;
+            if (gen_idx > 19) gen_idx = 0;
             draw_level_select();
             break;
         case 15: // credits
             draw_credits();
             break;
         case 16: // options
-            if (gen_idx < 1) gen_idx = 1;
-            if (gen_idx > 5) gen_idx = 5;
+            if (gen_idx < 1) gen_idx = 5;
+            if (gen_idx > 5) gen_idx = 1;
             draw_options();
             break;
         case 17: // press any key to begin loaded game
@@ -336,6 +349,9 @@ int main(){
         case 18:
             // draw saved game notificatipon here
             draw_game_saved();
+            break;
+        case 20:
+            draw_help();
             break;
         default:
             break;

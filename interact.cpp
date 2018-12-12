@@ -145,7 +145,7 @@ bool update_object (int id, int dx, int dy){
                     return true;
                 }
             } else if (registry[i].type == 0 && registry[i].rtype == 6) {
-                if (registry[id].type == 2) timer_on += 7;
+                if (registry[id].type == 2 && timer_on >= 0) timer_on += 7;
                 respawn_entity(registry[i].ridx);
             } else if (registry[i].type == 0 && registry[i].rtype == 100) {
                 do_win_screen();

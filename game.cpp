@@ -50,7 +50,10 @@ bool make_entity_at(int x, int y, int t){
     if (entity_spawn_lock &&
         abs(x - cha_x) <= 2 &&
         abs(y - cha_y) <= 2 &&
-        (t == 2 || t == 4)) return false;
+        (t == 2 || t == 4)){
+        std::cout << "P: " << x << " " << y << " C: " << cha_x << " " << cha_y  << " N: " << S_WIDTH / 2 << " " << S_HEIGHT / 2 << " " << std::endl;
+        t = 3;
+    }
 
     if ((signed int)entities.size() - 5 >= S_WIDTH * S_HEIGHT)
         if (debug) std::cout << "potential issues with placing entity at (" << x << "," << y << ") with type " << t << " (" << (signed int) entities.size() - 5 << " > " << S_WIDTH * S_HEIGHT << ")." << std::endl;
@@ -126,7 +129,7 @@ void tick_enemy(enemy_t &en, std::vector<entity_t> &e, int cx, int cy){
     } else if (en._t == 4) {
         // BOSS ENEMY
         // hunts, lasers every other turn
-        // killable basically only through grrnades
+        // killable basicreturn false;ally only through grrnades
         // hunts at half speed
         // on death, spawns doors
 
@@ -221,6 +224,8 @@ void do_gen_next_level(void){
     case 17:
         generate_terrain();
         break;
+    case 18:
+        generate_dense_terrain();
     case 19:
         generate_boss();
         break;
@@ -503,17 +508,14 @@ void save_game(int slot) {
 }
 
 void goto_loaded_game() {
-    if (level == 0) {
-        cha_x = 2;
-        cha_y = 12;
-    }
     state = 1;
 }
 
 void select_load_level(int lvl) {
     level = lvl;
     do_gen_next_level();
-    if (level == 0) {
+    if (lvl == 0) {
+        std::cout << "corrected" << std::endl;
         cha_x = 2;
         cha_y = 12;
     }

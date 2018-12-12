@@ -22,11 +22,25 @@ void setup_lvlbg(void){
 }
 */
 
+void put_left_text(std::string str, sf::Color clr, int y_offset){
+    sf::Text text;
+    text.setFont(font);
+    text.setString(str);
+    text.setFillColor(clr);
+    text.setCharacterSize(25);
+    sf::FloatRect b = text.getLocalBounds();
+    text.setPosition((S_WIDTH * 16) - b.width, ((S_HEIGHT + 3) * 16) / 2 - b.height + y_offset); //125
+    renderTexture.draw(text);
+}
+
 void draw_tutorial_level_text(void){
     jumptex_xyt(0, 2, "Press 't' to skip this tutorial");
 
     if (cha_x > 0) {
         jumptex_xyt(0, 9, "Use WASD to move");
+    }
+    if (cha_x > 7) {
+        jumptex_xyt(6, 17, "Collect timer tokens to keep the timer above zero.");
     }
     if (cha_x > 25) {
         jumptex_xyt(20, 10, "Avoid walls");
@@ -361,14 +375,34 @@ void draw_main_menu(){
     renderTexture.draw(text);
 
     if (gen_idx == 5) {
+        text.setString("----------RESUME");
+        if (game_session_valid){
+            text.setFillColor(sf::Color(255, 255, 255));
+        } else {
+            text.setFillColor(sf::Color(127, 127, 127));
+        }
+    } else {
+        text.setString("RESUME");
+        if (game_session_valid) {
+            text.setFillColor(sf::Color(0, 255, 0));
+        } else {
+            text.setFillColor(sf::Color(0, 127, 0));
+        }
+    }
+    b = text.getLocalBounds();
+    text.setPosition((S_WIDTH * 16) - b.width, ((S_HEIGHT + 3) * 16) / 2 - b.height + 50); //175
+    renderTexture.draw(text);
+
+    if (gen_idx == 6) {
         text.setString("---------OPTIONS");
         text.setFillColor(sf::Color(255, 255, 255));
     } else {
         text.setString("OPTIONS");
         text.setFillColor(sf::Color(0, 255, 0));
     }
+
     b = text.getLocalBounds();
-    text.setPosition((S_WIDTH * 16) - b.width, ((S_HEIGHT + 3) * 16) / 2 - b.height + 50); //175
+    text.setPosition((S_WIDTH * 16) - b.width, ((S_HEIGHT + 3) * 16) / 2 - b.height + 75); //175
     renderTexture.draw(text);
 
     text.setString("GLOBAL_SCORE:" + patch::to_string(global_score) + " TURNS:" + patch::to_string(turns));
@@ -420,6 +454,13 @@ void draw_load_game(){
 
     renderTexture.draw(text);
 
+    text.setString(":::LOAD_GANE:::");
+    text.setFillColor(sf::Color(255, 255, 255)); //003300
+    text.setCharacterSize(25);
+    b = text.getLocalBounds();
+    text.setPosition((S_WIDTH * 16) - b.width, ((S_HEIGHT + 3) * 16) / 2 - b.height - 75); //50
+    renderTexture.draw(text);
+
     if (gen_idx == 0) {
         text.setString("LOAD ---- SLOT_0");
         text.setFillColor(sf::Color(255, 255, 255));
@@ -429,7 +470,7 @@ void draw_load_game(){
     }
     text.setCharacterSize(25);
     b = text.getLocalBounds();
-    text.setPosition((S_WIDTH * 16) - b.width, ((S_HEIGHT + 3) * 16) / 2 - b.height - 75); //50
+    text.setPosition((S_WIDTH * 16) - b.width, ((S_HEIGHT + 3) * 16) / 2 - b.height - 50); //50
     renderTexture.draw(text);
 
     if (gen_idx == 1) {
@@ -440,7 +481,7 @@ void draw_load_game(){
         text.setFillColor(sf::Color(0, 255, 0));
     }
     b = text.getLocalBounds();
-    text.setPosition((S_WIDTH * 16) - b.width, ((S_HEIGHT + 3) * 16) / 2 - b.height - 50); // 75
+    text.setPosition((S_WIDTH * 16) - b.width, ((S_HEIGHT + 3) * 16) / 2 - b.height - 25); // 75
     renderTexture.draw(text);
 
     if (gen_idx == 2) {
@@ -451,7 +492,7 @@ void draw_load_game(){
         text.setFillColor(sf::Color(0, 255, 0));
     }
     b = text.getLocalBounds();
-    text.setPosition((S_WIDTH * 16) - b.width, ((S_HEIGHT + 3) * 16) / 2 - b.height - 25); //100
+    text.setPosition((S_WIDTH * 16) - b.width, ((S_HEIGHT + 3) * 16) / 2 - b.height); //100
     renderTexture.draw(text);
 
     if (gen_idx == 3) {
@@ -462,7 +503,7 @@ void draw_load_game(){
         text.setFillColor(sf::Color(0, 255, 0));
     }
     b = text.getLocalBounds();
-    text.setPosition((S_WIDTH * 16) - b.width, ((S_HEIGHT + 3) * 16) / 2 - b.height); //125
+    text.setPosition((S_WIDTH * 16) - b.width, ((S_HEIGHT + 3) * 16) / 2 - b.height + 25); //125
     renderTexture.draw(text);
 
     if (gen_idx == 4) {
@@ -473,7 +514,7 @@ void draw_load_game(){
         text.setFillColor(sf::Color(0, 255, 0));
     }
     b = text.getLocalBounds();
-    text.setPosition((S_WIDTH * 16) - b.width, ((S_HEIGHT + 3) * 16) / 2 - b.height + 25); //150
+    text.setPosition((S_WIDTH * 16) - b.width, ((S_HEIGHT + 3) * 16) / 2 - b.height + 50); //150
     renderTexture.draw(text);
 
     if (gen_idx == 5) {
@@ -484,7 +525,7 @@ void draw_load_game(){
         text.setFillColor(sf::Color(0, 255, 0));
     }
     b = text.getLocalBounds();
-    text.setPosition((S_WIDTH * 16) - b.width, ((S_HEIGHT + 3) * 16) / 2 - b.height + 50); //175
+    text.setPosition((S_WIDTH * 16) - b.width, ((S_HEIGHT + 3) * 16) / 2 - b.height + 75); //175
     renderTexture.draw(text);
 }
 
@@ -502,6 +543,13 @@ void draw_save_game(){
 
     renderTexture.draw(text);
 
+    text.setString(":::SAVE_GAME:::");
+    text.setFillColor(sf::Color(255, 255, 255)); //003300
+    text.setCharacterSize(25);
+    b = text.getLocalBounds();
+    text.setPosition((S_WIDTH * 16) - b.width, ((S_HEIGHT + 3) * 16) / 2 - b.height - 75); //50
+    renderTexture.draw(text);
+
     if (gen_idx == 0) {
         text.setString("SAVE ---- SLOT_0");
         text.setFillColor(sf::Color(255, 255, 255));
@@ -511,7 +559,7 @@ void draw_save_game(){
     }
     text.setCharacterSize(25);
     b = text.getLocalBounds();
-    text.setPosition((S_WIDTH * 16) - b.width, ((S_HEIGHT + 3) * 16) / 2 - b.height - 75); //50
+    text.setPosition((S_WIDTH * 16) - b.width, ((S_HEIGHT + 3) * 16) / 2 - b.height - 50); //50
     renderTexture.draw(text);
 
     if (gen_idx == 1) {
@@ -522,7 +570,7 @@ void draw_save_game(){
         text.setFillColor(sf::Color(0, 255, 0));
     }
     b = text.getLocalBounds();
-    text.setPosition((S_WIDTH * 16) - b.width, ((S_HEIGHT + 3) * 16) / 2 - b.height - 50); // 75
+    text.setPosition((S_WIDTH * 16) - b.width, ((S_HEIGHT + 3) * 16) / 2 - b.height - 25); // 75
     renderTexture.draw(text);
 
     if (gen_idx == 2) {
@@ -533,7 +581,7 @@ void draw_save_game(){
         text.setFillColor(sf::Color(0, 255, 0));
     }
     b = text.getLocalBounds();
-    text.setPosition((S_WIDTH * 16) - b.width, ((S_HEIGHT + 3) * 16) / 2 - b.height - 25); //100
+    text.setPosition((S_WIDTH * 16) - b.width, ((S_HEIGHT + 3) * 16) / 2 - b.height); //100
     renderTexture.draw(text);
 
     if (gen_idx == 3) {
@@ -544,7 +592,7 @@ void draw_save_game(){
         text.setFillColor(sf::Color(0, 255, 0));
     }
     b = text.getLocalBounds();
-    text.setPosition((S_WIDTH * 16) - b.width, ((S_HEIGHT + 3) * 16) / 2 - b.height); //125
+    text.setPosition((S_WIDTH * 16) - b.width, ((S_HEIGHT + 3) * 16) / 2 - b.height + 25); //125
     renderTexture.draw(text);
 
     if (gen_idx == 4) {
@@ -555,7 +603,7 @@ void draw_save_game(){
         text.setFillColor(sf::Color(0, 255, 0));
     }
     b = text.getLocalBounds();
-    text.setPosition((S_WIDTH * 16) - b.width, ((S_HEIGHT + 3) * 16) / 2 - b.height + 25); //150
+    text.setPosition((S_WIDTH * 16) - b.width, ((S_HEIGHT + 3) * 16) / 2 - b.height + 50); //150
     renderTexture.draw(text);
 
     if (gen_idx == 5) {
@@ -566,7 +614,7 @@ void draw_save_game(){
         text.setFillColor(sf::Color(0, 255, 0));
     }
     b = text.getLocalBounds();
-    text.setPosition((S_WIDTH * 16) - b.width, ((S_HEIGHT + 3) * 16) / 2 - b.height + 50); //175
+    text.setPosition((S_WIDTH * 16) - b.width, ((S_HEIGHT + 3) * 16) / 2 - b.height + 75); //175
     renderTexture.draw(text);
 }
 
@@ -652,9 +700,9 @@ void draw_options(){
     renderTexture.draw(text);
 
     if (gen_idx == 1) {
-        text.setFillColor(sf::Color(0, 255, 0)); // 00ff00
+        text.setFillColor(sf::Color(255, 255, 255)); // 00ff00
     } else {
-        text.setFillColor(sf::Color(0, 127, 0)); // 00ff00
+        text.setFillColor(sf::Color(0, 255, 0)); // 00ff00
     }
     text.setString("TOGGLE DEBUG " + patch::to_string(debug ? "[ON]" : "[OFF]"));
     b = text.getLocalBounds();
@@ -662,9 +710,9 @@ void draw_options(){
     renderTexture.draw(text);
 
     if (gen_idx == 2) {
-        text.setFillColor(sf::Color(0, 255, 0)); // 00ff00
+        text.setFillColor(sf::Color(255, 255, 255)); // 00ff00
     } else {
-        text.setFillColor(sf::Color(0, 127, 0)); // 00ff00
+        text.setFillColor(sf::Color(0, 255, 0)); // 00ff00
     }
     text.setString("TOGGLE CHEATS " + patch::to_string(cheats ? "[ON]" : "[OFF]"));
     b = text.getLocalBounds();
@@ -672,9 +720,9 @@ void draw_options(){
     renderTexture.draw(text);
 
     if (gen_idx == 3) {
-        text.setFillColor(sf::Color(0, 255, 0)); // 00ff00
+        text.setFillColor(sf::Color(255, 255, 255)); // 00ff00
     } else {
-        text.setFillColor(sf::Color(0, 127, 0)); // 00ff00
+        text.setFillColor(sf::Color(0, 255, 0)); // 00ff00
     }
     text.setString("RELOAD AUDIO");
     b = text.getLocalBounds();
@@ -682,9 +730,9 @@ void draw_options(){
     renderTexture.draw(text);
 
     if (gen_idx == 4) {
-        text.setFillColor(sf::Color(0, 255, 0)); // 00ff00
+        text.setFillColor(sf::Color(255, 255, 255)); // 00ff00
     } else {
-        text.setFillColor(sf::Color(0, 127, 0)); // 00ff00
+        text.setFillColor(sf::Color(0, 255, 0)); // 00ff00
     }
     text.setString("RELOAD GRAPHICS");
     b = text.getLocalBounds();
@@ -692,7 +740,7 @@ void draw_options(){
     renderTexture.draw(text);
 
     if (gen_idx == 5) {
-        text.setFillColor(sf::Color(0, 255, 0)); // 00ff00
+        text.setFillColor(sf::Color(127, 127, 127)); // 00ff00
     } else {
         text.setFillColor(sf::Color(0, 127, 0)); // 00ff00
     }
@@ -750,4 +798,43 @@ void draw_game_saved(){
     b = text.getLocalBounds();
     text.setPosition((S_WIDTH * 16) - b.width, ((S_HEIGHT + 3) * 16) / 2 - b.height); //125
     renderTexture.draw(text);
+}
+
+void draw_help() {
+    sf::Color green = sf::Color(0, 127, 0);
+    sf::Color ltgreen = sf::Color(0, 255, 0);
+    sf::Color white = sf::Color(255, 255, 255);
+
+    sf::Text text;
+    text.setString("a_game");
+    text.setCharacterSize(50);
+    text.setFillColor(white); // todo animate colors
+    text.setFont(font);
+
+    // center text
+    sf::FloatRect b = text.getLocalBounds();
+    text.setPosition(0, ((S_HEIGHT + 3) * 16) / 2 - b.height);
+
+    renderTexture.draw(text);
+
+
+    put_left_text("MENU KEYBINDINGS:", ltgreen, -250);
+    put_left_text("    UP :    [UP][W][NUMPAD8]", green, -225);
+    put_left_text("  DOWN :  [DOWN][S][NUMPAD2]", green, -200);
+    put_left_text("SELECT : [RIGHT][D][NUMPAD6]", green, -175);
+    put_left_text("  BACK :  [LEFT][A][NUMPAD4]", green, -150);
+
+    put_left_text("GAME KEYBINDINGS:", ltgreen, -100);
+    put_left_text("  MOVE : [WASD]", green, -75);
+    put_left_text("SHIELD :    [Q]", green, -50);
+    put_left_text("  MENU :    [Z]", green, -25);
+
+    put_left_text("PLAY GUIDE:", ltgreen, 25);
+    put_left_text("AVOID BOMBS AND ENEMIES.", green, 50);
+    put_left_text("COLLECT TIME TOKENS TO KEEP YOUR TIMER UP.", green, 75);
+    put_left_text("A SCORE BELOW -20 ENDS THE GAME.", green, 100);
+    put_left_text("LASERS COUNT DOWN AND FIRE LASERS AT YOU.", green, 125);
+    put_left_text("GET TO THE DOOR TOKENS TO GET TO THE NEXT LEVEL.", green, 150);
+
+    put_left_text("PRESS [SPACE] TO RETURN TO THE MAIN MENU", white, 225);
 }

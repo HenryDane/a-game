@@ -16,6 +16,7 @@ void draw_level_select();
 void draw_credits();
 void draw_options();
 void draw_game_saved();
+void draw_help();
 
 void draw_explosion(int x, int y, int r);
 void draw_tutorial_level_text(void);

@@ -239,6 +239,12 @@ bool generate_tutorial(void){
     make_entity_at(30, 12 + 1, 4 );
     make_entity_at(30, 12 - 1, 4 );
 
+    make_entity_at(20, 12, 6);
+    make_entity_at(21, 12, 6);
+    make_entity_at(22, 12, 6);
+    make_entity_at(23, 12, 6);
+    make_entity_at(24, 12, 6);
+
     make_entity_at(50, 12, 1);
 
     make_entity_at(55, 12, 3);
@@ -252,7 +258,15 @@ bool generate_tutorial(void){
     enemies.push_back(enemy);
     register_object(enemy._id, 1, 0, -1);
 
-    make_entity_at(80, 12, 5);
+    enemy.init(80, 12, 2, global_uuid_next++);
+    enemies.push_back(enemy);
+    register_object(enemy._id, 1, 1, -1);
+
+    enemy.init(79, 19, 3, global_uuid_next++);
+    enemies.push_back(enemy);
+    register_object(enemy._id, 1, 1, -1);
+
+    make_entity_at(75, 12, 5);
 
     return true;
 }
@@ -335,7 +349,10 @@ bool generate_pacman_time(void) {
     entities.clear();
     enemies.clear();
     regen_on = false;
-    timer_on = 10;
+    timer_on = 15;
+
+	cha_x = S_WIDTH / 2;
+    cha_y = S_HEIGHT / 2;
 
     entity_spawn_lock = true;
 
@@ -352,7 +369,7 @@ bool generate_pacman_time(void) {
             } else if (k == 2 || k == 3 || k == 4) {
                 make_entity_at(i, j, 2);
             } else if (k == 5) {
-                make_entity_at(i, j, (rand () % 2 == 0) ? 6 : ((rand() % 3 == 0) ? 3 : 1));
+                make_entity_at(i, j, (rand () % 2 == 0) ? 6 : ((rand() % 3 == 0) ? 1 : 3));
             } else {
                 make_entity_at(i, j, (rand() % 3 == 0) ? 3 : 1);
             }
