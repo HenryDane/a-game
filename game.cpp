@@ -1,4 +1,6 @@
 #include <iostream>
+#include <fstream>
+#include "patch.h"
 #include "console.h"
 #include "main.h"
 #include "interact.h"
@@ -6,7 +8,7 @@
 #include "level.h"
 
 void do_level_screen(int lvl){
-
+    // do nothing
 }
 
 void do_win_screen(void){
@@ -206,10 +208,7 @@ void do_gen_next_level(void){
     case 11:
     case 12:
         generate_gridworld();
-        break;    make_entity_at(0, 0, 5);
-    make_entity_at(S_WIDTH, 0, 5);
-    make_entity_at(S_WIDTH, S_HEIGHT, 5);
-    make_entity_at(0, S_HEIGHT, 5);
+        break;
     case 13:
         generate_impossible();
         break;
@@ -222,53 +221,6 @@ void do_gen_next_level(void){
         generate_terrain();
         break;
     case 19:
-        break;
-    case 20:
-    case 21:
-    case 22:
-        break;
-    case 23:
-        break;
-    case 24:
-    case 25:
-    case 26:
-        break;
-    case 27:
-        break;
-    case 28:
-    case 29:
-    case 30:
-        break;
-    case 31:
-        break;
-    case 32:
-    case 33:
-    case 34:
-        break;
-    case 35:
-        break;
-    case 36:
-    case 37:
-    case 38:
-        break;
-    case 39:
-        break;
-    case 40:
-    case 41:
-    case 42:
-        break;
-    case 43:
-        break;
-    case 44:
-    case 45:
-    case 46:
-        break;
-    case 47:
-        break;
-    case 48:
-    case 49:
-        break;
-    case 50:
         generate_boss();
         break;
     default:
@@ -291,4 +243,192 @@ void do_gen_next_level(void){
     do_level_screen(level);
 
     //draw();
+}
+
+void do_new_game() {
+    // clean up lists
+    registry.clear();
+    enemies.clear();
+    entities.clear();
+    particles.clear();
+
+    // set up variables
+    cha_x = S_WIDTH / 2;
+    cha_y = S_HEIGHT / 2;
+    score = 5;
+    global_score = 0;
+    level = 0;
+    shield = -1002; // signals first turn
+    turns = 0;
+
+    // reset flags
+    regen_on = true; // do entities regen?
+    timer_on = -1; // if >= 0 timer is on
+    // dots_on = false; // flag for dots display
+    entity_spawn_lock = false; // flag for deleting everything nearby
+    entity_overlap_check_on = false; // prevent overlap spawn
+    respawn_bomb_on = true;
+
+    // set up lists
+    init_registry();
+    entities.reserve(100);
+    enemies.reserve(30);
+    particles.reserve(100);
+
+    // register player
+    register_object(global_uuid_next++, 2, 0, 0); // register player
+
+    // prepare map
+    generate_tutorial(); // set up map
+
+    // spawn player
+    player_set_safe(); // go to safe location
+
+    // begin actual game
+    state = 2;
+}
+
+void load_game(int slot) {
+    std::fstream file;
+    file.open("slot" + patch::to_string(slot), std::ios::in);
+    if (!file.is_open()) {
+        std::cout << "Failed to load slot" << slot << "! Unable to load!" << std::endl;
+        //abort();
+        return;
+    }
+
+    std::string tmp;
+    int t_size;
+    int t_idx;
+
+    file >> tmp;
+    if (tmp[0] != '=') {
+        std::cout << "Failed to read header" << std::endl;
+        abort();
+    }
+
+    // read variables
+    file >> cha_x >> cha_y >> score >> global_score >> level >> shield >> turns;
+
+    // read flags
+    file >> regen_on >> timer_on >> entity_spawn_lock >> entity_overlap_check_on >> respawn_bomb_on;
+
+    // read registry
+    file >> t_size;
+    for (int i = 0 ; i < t_size; i++){
+        registry_key_t rkt_t;
+        file >> t_idx >> rkt_t.id >> rkt_t.ridx >> rkt_t.rtype >> rkt_t.type;
+        registry.push_back(rkt_t);
+    }
+
+    // read enemies
+    file >> t_size;
+    for (int i = 0 ; i < t_size; i++){
+        enemy_t e_t;
+        file >> t_idx >> e_t._id >> e_t._score >> e_t._state >> e_t._t >> e_t._x >> e_t._y;
+        enemies.push_back(e_t);
+    }
+
+    // read entities
+    file >> t_size;
+    for (int i = 0 ; i < t_size; i++){
+        entity_t e_t;
+        file >> t_idx >> e_t.t >> e_t.x >> e_t.y;
+        entities.push_back(e_t);
+    }
+
+    // read particles
+    file >> t_size;
+    for (int i = 0 ; i < t_size; i++){
+        particle_t p_t;
+        file >> t_idx >> p_t.ttl >> p_t.type >> p_t.x >> p_t.y;
+        particles.push_back(p_t);
+    }
+
+    for (int i = 0; i < 4; i++) {
+        file >> tmp;
+        if (tmp != "[END]") {
+            std::cout << "Bad footer" << std::endl;
+            abort();
+        }
+    }
+
+    file >> tmp;
+    std::cout << tmp;
+
+    file.close();
+}
+
+void save_game(int slot) {
+    bool debug = false;
+
+    std::fstream file;
+    file.open("slot" + patch::to_string(slot), std::ios::out);
+    if (!file.is_open()) {
+        std::cout << "Failed to load slot" << slot << "! Crashing...." << std::endl;
+        abort();
+    }
+
+    // header
+    file << "=========SLOT" << slot << "=========" << std::endl;
+    if (debug) std::cout << "=========SLOT" << slot << "=========" << std::endl;
+
+    // write globals
+    file << cha_x << " " << cha_y << " " << score << " " << global_score << " " << level << " " << shield << " " << turns << " " << std::endl;
+    if (debug) std::cout << cha_x << " " << cha_y << " " << score << " " << global_score << " " << level << " " << shield << " " << turns << " " << std::endl;
+
+    // write flags
+    file << regen_on << " " << timer_on << " " << entity_spawn_lock << " " << entity_overlap_check_on << " " << respawn_bomb_on << " " << std::endl;
+    if (debug) std::cout << regen_on << " " << timer_on << " " << entity_spawn_lock << " " << entity_overlap_check_on << " " << respawn_bomb_on << " " << std::endl;
+
+    // write registry
+    file << registry.size() << std::endl;
+    if (debug) std::cout << registry.size() << std::endl;
+    for (int i = 0; i < registry.size(); i++) {
+        file << i << " " << registry[i].id << " " << registry[i].ridx << " " << registry[i].rtype << " " << registry[i].type << " " << std::endl;
+        if (debug) std::cout << i << " " << registry[i].id << " " << registry[i].ridx << " " << registry[i].rtype << " " << registry[i].type << " " << std::endl;
+    }
+
+    // write enemies
+    file << enemies.size() << std::endl;
+    if (debug) std::cout << enemies.size() << std::endl;
+    for (int i = 0; i < enemies.size(); i++) {
+        file << i << " " << enemies[i]._id << " " << enemies[i]._score << " " << enemies[i]._state << " " << enemies[i]._t << " " << enemies[i]._x << " " << enemies[i]._y << " " << std::endl;
+        if (debug) std::cout << i << " " << enemies[i]._id << " " << enemies[i]._score << " " << enemies[i]._state << " " << enemies[i]._t << " " << enemies[i]._x << " " << enemies[i]._y << " " << std::endl;
+    }
+
+    // write entities
+    file << entities.size() << std::endl;
+    if (debug) std::cout << entities.size() << std::endl;
+    for (int i = 0; i < entities.size(); i++) {
+        file << i << " " << entities[i].t << " " << entities[i].x << " " << entities[i].y << " " << std::endl;
+        if (debug) std::cout << i << " " << entities[i].t << " " << entities[i].x << " " << entities[i].y << " " << std::endl;
+    }
+
+    // write particles
+    file << particles.size() << std::endl;
+    if (debug) std::cout << particles.size() << std::endl;
+    for(int i = 0; i < particles.size(); i++){
+        file << i << " " << particles[i].ttl << " " << particles[i].type << " " << particles[i].x << " " << particles[i].y << " " << std::endl;
+        if (debug) std::cout << i << " " << particles[i].ttl << " " << particles[i].type << " " << particles[i].x << " " << particles[i].y << " " << std::endl;
+    }
+
+    file << "[END] [END] [END] [END]" << std::endl;
+    if (debug) std::cout << "[END] [END] [END] [END]" << std::endl;
+
+    file << "=========SLOTEND=========" << std::endl;
+    if (debug) std::cout << "=========SLOTEND=========" << std::endl;
+
+    std::cout << "Done saving." << std::endl;
+
+    file.close();
+}
+
+void goto_loaded_game() {
+    state = 1;
+}
+
+void select_load_level(int lvl) {
+    level = lvl;
+    do_gen_next_level();
 }

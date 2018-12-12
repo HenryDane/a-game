@@ -27,6 +27,7 @@ std::vector<entity_t> entities;
 std::vector<enemy_t> enemies;
 std::vector<particle_t> particles;
 int global_uuid_next = 0;
+int turns = 0;
 
 // flags
 bool regen_on = true; // do entities regen?
@@ -141,35 +142,43 @@ int main(){
                 if (event.key.code == sf::Keyboard::Escape) {
                     window.close();
                     return 0;
-                } else if (event.key.code == sf::Keyboard::Tab) {
-                    //std::cout << music.getPlayingOffset().asSeconds() << " | " << music.getDuration().asSeconds() << std::endl;
-                    score += 1000;
-                } else if (event.key.code == sf::Keyboard::Tilde) {
-                    skip_seconds(30);
                 } else if (event.key.code == sf::Keyboard::LBracket) { // '['
                     decrease_volume(20);
                 } else if (event.key.code == sf::Keyboard::RBracket) { // '['
                     increase_volume(20);
                 } else if (event.key.code == sf::Keyboard::BackSlash) {
                     skip_current_song();
-                } else if (event.key.code == sf::Keyboard::Add) {
+                }
+
+                /*else if (event.key.code == sf::Keyboard::Add) {
                     state++;
                 } else if (event.key.code == sf::Keyboard::Subtract) {
                     state--;
                 } else if (event.key.code == sf::Keyboard::Enter) {
                     std::cout << "State: " << state << std::endl;
-                } else if (event.key.code == sf::Keyboard::Numpad8 ||
-                           event.key.code == sf::Keyboard::Up) {
-                    gen_idx--;
-                } else if (event.key.code == sf::Keyboard::Numpad2 ||
-                           event.key.code == sf::Keyboard::Down) {
-                    gen_idx++;
+                } else if (event.key.code == sf::Keyboard::Tab) {
+                    //std::cout << music.getPlayingOffset().asSeconds() << " | " << music.getDuration().asSeconds() << std::endl;
+                    score += 1000;
+                } else if (event.key.code == sf::Keyboard::Tilde) { // conflict with menu key`
+                    skip_seconds(30);
+                } */
+
+                if (state >= 10) {
+                    if (event.key.code == sf::Keyboard::Numpad8 ||
+                        event.key.code == sf::Keyboard::Up ||
+                        event.key.code == sf::Keyboard::W) {
+                        gen_idx--;
+                    } else if (event.key.code == sf::Keyboard::Numpad2 ||
+                               event.key.code == sf::Keyboard::Down ||
+                               event.key.code == sf::Keyboard::S) {
+                        gen_idx++;
+                    }
                 }
 
                 switch (state) {
                 case 0: // title screen
                     if (event.key.code == sf::Keyboard::Space) {
-                        state = 3; // tutorial pre-screen
+                        state = 10; // tutorial pre-screen
                     }
                     break;
                 case 1: // normal gameplay
@@ -188,23 +197,81 @@ int main(){
                 case 5:
                 case 4:
                     if (event.key.code == sf::Keyboard::Space) {
-                        window.close();
-                        return 0;
+                        //window.close();
+                        //return 0;
+                        state = 10;
                     }
                     break;
                 case 10: // main menu
+                    if (event.key.code == sf::Keyboard::Right ||
+                        event.key.code == sf::Keyboard::Numpad6) {
+                        switch (gen_idx) {
+                            case 0: state = 11; break;
+                            case 1: state = 12; break;
+                            case 2: state = 13; break;
+                            case 3: state = 14; break;
+                            case 4: state = 15; break;
+                            case 5: state = 16; break;
+                            default: break;
+                        }
+                    }
                     break;
                 case 11: // new game
+                    // any key to start
+                    do_new_game();
                     break;
                 case 12: // load game
+                    if (event.key.code == sf::Keyboard::Right ||
+                        event.key.code == sf::Keyboard::Numpad6) {
+                        load_game(gen_idx);
+                        state = 17;
+                    } else if (event.key.code == sf::Keyboard::Left ||
+                        event.key.code == sf::Keyboard::Numpad4) {
+                        state = 10;
+                    }
                     break;
                 case 13: // save game
+                    if (event.key.code == sf::Keyboard::Right ||
+                        event.key.code == sf::Keyboard::Numpad6) {
+                        save_game(gen_idx);
+                        state = 18; // game saved
+                    } else if (event.key.code == sf::Keyboard::Left ||
+                        event.key.code == sf::Keyboard::Numpad4) {
+                        state = 10;
+                    }
                     break;
                 case 14: // level select
+                    if (event.key.code == sf::Keyboard::Right ||
+                        event.key.code == sf::Keyboard::Numpad6) {
+                        select_load_level(gen_idx);
+                        state = 2; // press any key to begin selected level
+                    } else if (event.key.code == sf::Keyboard::Left ||
+                        event.key.code == sf::Keyboard::Numpad4) {
+                        state = 10;
+                    }
                     break;
                 case 15: // credits
+                    state = 10; // go to main menu
                     break;
                 case 16: // options
+                    // TODO (add main menu option)
+                    // TODO (add resume game option (only if there is a valid game ready))
+                    if (event.key.code == sf::Keyboard::Left ||
+                        event.key.code == sf::Keyboard::Numpad4) {
+                        state = 10;
+                    }
+                    break;
+                case 17: // press any key to begin loaded game
+                    goto_loaded_game();
+                    break;
+                case 18: // game saved
+                    if (event.key.code == sf::Keyboard::Right ||
+                        event.key.code == sf::Keyboard::Numpad6) {
+                        state = 13;
+                    } else if (event.key.code == sf::Keyboard::Left ||
+                        event.key.code == sf::Keyboard::Numpad4) {
+                        state = 10;
+                    }
                     break;
                 default:
                     std::cout << "bad state!" << std::endl;
@@ -234,18 +301,26 @@ int main(){
             draw_win_screen();
             break;
         case 10: // main menu
+            if (gen_idx < 0) gen_idx = 0;
+            if (gen_idx > 5) gen_idx = 5;
             draw_main_menu();
             break;
         case 11: // new game
             draw_new_game();
             break;
         case 12: // load game
+            if (gen_idx < 0) gen_idx = 0;
+            if (gen_idx > 5) gen_idx = 5;
             draw_load_game();
             break;
         case 13: // save game
+            if (gen_idx < 0) gen_idx = 0;
+            if (gen_idx > 5) gen_idx = 5;
             draw_save_game();
             break;
         case 14: // level select
+            if (gen_idx < 0) gen_idx = 0;
+            if (gen_idx > 19) gen_idx = 19;
             draw_level_select();
             break;
         case 15: // credits
@@ -253,6 +328,13 @@ int main(){
             break;
         case 16: // options
             draw_options();
+            break;
+        case 17: // press any key to begin loaded game
+            draw_new_game();
+            break;
+        case 18:
+            // draw saved game notificatipon here
+            draw_game_saved();
             break;
         default:
             break;
@@ -299,6 +381,10 @@ int handle_key(sf::Keyboard::Key k){
             return 0;
         }
         break;
+    case 'z': // main menu
+    case 'Z':
+        state = 10;
+        return 0;
     case 'W':
     case 'w':
         update_object(0, 0, -1);
@@ -364,10 +450,10 @@ int handle_key(sf::Keyboard::Key k){
     if (timer_on > 0) timer_on --;
 
     // handle timer
-    if (timer_on == 0 && level == 25){
+    if (timer_on == 0 && level == 19){
         //do_win_screen();
         make_entity_at(S_WIDTH / 2, S_HEIGHT / 2, 100);
-    } else if (timer_on == 0 && level != 25) {
+    } else if (timer_on == 0 && level != 19) {
         score -= 1000;
     }
 
@@ -387,6 +473,8 @@ int handle_key(sf::Keyboard::Key k){
             if (i >= 0) i--;
         }
     }
+
+    turns++;
 
     return 0;
 }

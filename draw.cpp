@@ -85,10 +85,10 @@ void draw_gfx(void) {
     }
 
     // lasers
-    for (enemy_t e : enemies){
-        //if (e._t == 2) sf_line(e._x * TILE_WIDTH + HALF_TILE_WIDTH, 0 + (2 * TILE_WIDTH), e._x * TILE_WIDTH + HALF_TILE_WIDTH, (S_HEIGHT + 1) * TILE_WIDTH + (2 * TILE_WIDTH));
-        //if (e._t == 3) sf_line(0, e._y * TILE_WIDTH + HALF_TILE_WIDTH  + (2 * TILE_WIDTH), (S_WIDTH + 1) * TILE_WIDTH, e._y * TILE_WIDTH + HALF_TILE_WIDTH + (2 * TILE_WIDTH));
-    }
+    /*for (enemy_t e : enemies){
+        if (e._t == 2) sf_line(e._x * TILE_WIDTH + HALF_TILE_WIDTH, 0 + (2 * TILE_WIDTH), e._x * TILE_WIDTH + HALF_TILE_WIDTH, (S_HEIGHT + 1) * TILE_WIDTH + (2 * TILE_WIDTH));
+        if (e._t == 3) sf_line(0, e._y * TILE_WIDTH + HALF_TILE_WIDTH  + (2 * TILE_WIDTH), (S_WIDTH + 1) * TILE_WIDTH, e._y * TILE_WIDTH + HALF_TILE_WIDTH + (2 * TILE_WIDTH));
+    }*/
 
     // entities
     for (entity_t e : entities){
@@ -297,8 +297,10 @@ void draw_main_menu(){
     text.setFont(font);
 
     // center text
-    sf::FloatRect b = text.getLocalBounds();
-    text.setPosition(0, ((S_HEIGHT + 3) * 16) / 2 - b.height);
+    sf::FloatRect c = text.getLocalBounds();
+    text.setPosition(0, ((S_HEIGHT + 3) * 16) / 2 - c.height);
+
+    sf::FloatRect b;
 
     renderTexture.draw(text);
 
@@ -368,28 +370,336 @@ void draw_main_menu(){
     b = text.getLocalBounds();
     text.setPosition((S_WIDTH * 16) - b.width, ((S_HEIGHT + 3) * 16) / 2 - b.height + 50); //175
     renderTexture.draw(text);
+
+    text.setString("GLOBAL_SCORE:" + patch::to_string(global_score) + " TURNS:" + patch::to_string(turns));
+    b = text.getLocalBounds();
+    text.setPosition(0, ((S_HEIGHT + 3) * 16) - b.height - 7);
+    text.setColor(sf::Color(0, 0, 255));
+    renderTexture.draw(text);
 }
 
 void draw_new_game(){
+    sf::Text text;
+    text.setString("a_game");
+    //text.setPosition(10,10);
+    text.setCharacterSize(50);
+    text.setColor(sf::Color(255, 255, 255)); // todo animate colors
+    text.setFont(font);
 
+    // center text
+    sf::FloatRect b = text.getLocalBounds();
+    text.setPosition(0, ((S_HEIGHT + 3) * 16) / 2 - b.height);
+
+    renderTexture.draw(text);
+
+    text.setString("PRESS ANY KEY TO START");
+    text.setColor(sf::Color(0, 255, 0));
+    text.setCharacterSize(25);
+    b = text.getLocalBounds();
+    text.setPosition((S_WIDTH * 16) - b.width, ((S_HEIGHT + 3) * 16) / 2 - b.height); //125
+    renderTexture.draw(text);
 }
 
 void draw_load_game(){
+    sf::Text text;
+    text.setString("a_game");
+    //text.setPosition(10,10);
+    text.setCharacterSize(50);
+    text.setColor(sf::Color(255, 255, 255)); // todo animate colors
+    text.setFont(font);
 
+    // center text
+    sf::FloatRect b = text.getLocalBounds();
+    text.setPosition(0, ((S_HEIGHT + 3) * 16) / 2 - b.height);
+
+    renderTexture.draw(text);
+
+    if (gen_idx == 0) {
+        text.setString("LOAD ---- SLOT_0");
+        text.setColor(sf::Color(255, 255, 255));
+    } else {
+        text.setString("SLOT_0");
+        text.setColor(sf::Color(0, 255, 0));
+    }
+    text.setCharacterSize(25);
+    b = text.getLocalBounds();
+    text.setPosition((S_WIDTH * 16) - b.width, ((S_HEIGHT + 3) * 16) / 2 - b.height - 75); //50
+    renderTexture.draw(text);
+
+    if (gen_idx == 1) {
+        text.setString("LOAD ---- SLOT_1");
+        text.setColor(sf::Color(255, 255, 255));
+    } else {
+        text.setString("SLOT_1");
+        text.setColor(sf::Color(0, 255, 0));
+    }
+    b = text.getLocalBounds();
+    text.setPosition((S_WIDTH * 16) - b.width, ((S_HEIGHT + 3) * 16) / 2 - b.height - 50); // 75
+    renderTexture.draw(text);
+
+    if (gen_idx == 2) {
+        text.setString("LOAD ---- SLOT_2");
+        text.setColor(sf::Color(255, 255, 255));
+    } else {
+        text.setString("SLOT_2");
+        text.setColor(sf::Color(0, 255, 0));
+    }
+    b = text.getLocalBounds();
+    text.setPosition((S_WIDTH * 16) - b.width, ((S_HEIGHT + 3) * 16) / 2 - b.height - 25); //100
+    renderTexture.draw(text);
+
+    if (gen_idx == 3) {
+        text.setString("LOAD ---- SLOT_3");
+        text.setColor(sf::Color(255, 255, 255));
+    } else {
+        text.setString("SLOT_3");
+        text.setColor(sf::Color(0, 255, 0));
+    }
+    b = text.getLocalBounds();
+    text.setPosition((S_WIDTH * 16) - b.width, ((S_HEIGHT + 3) * 16) / 2 - b.height); //125
+    renderTexture.draw(text);
+
+    if (gen_idx == 4) {
+        text.setString("LOAD ---- SLOT_4");
+        text.setColor(sf::Color(255, 255, 255));
+    } else {
+        text.setString("SLOT_4");
+        text.setColor(sf::Color(0, 255, 0));
+    }
+    b = text.getLocalBounds();
+    text.setPosition((S_WIDTH * 16) - b.width, ((S_HEIGHT + 3) * 16) / 2 - b.height + 25); //150
+    renderTexture.draw(text);
+
+    if (gen_idx == 5) {
+        text.setString("LOAD ---- SLOT_5");
+        text.setColor(sf::Color(255, 255, 255));
+    } else {
+        text.setString("SLOT_5");
+        text.setColor(sf::Color(0, 255, 0));
+    }
+    b = text.getLocalBounds();
+    text.setPosition((S_WIDTH * 16) - b.width, ((S_HEIGHT + 3) * 16) / 2 - b.height + 50); //175
+    renderTexture.draw(text);
 }
 
 void draw_save_game(){
+    sf::Text text;
+    text.setString("a_game");
+    //text.setPosition(10,10);
+    text.setCharacterSize(50);
+    text.setColor(sf::Color(255, 255, 255)); // todo animate colors
+    text.setFont(font);
 
+    // center text
+    sf::FloatRect b = text.getLocalBounds();
+    text.setPosition(0, ((S_HEIGHT + 3) * 16) / 2 - b.height);
+
+    renderTexture.draw(text);
+
+    if (gen_idx == 0) {
+        text.setString("SAVE ---- SLOT_0");
+        text.setColor(sf::Color(255, 255, 255));
+    } else {
+        text.setString("SLOT_0");
+        text.setColor(sf::Color(0, 255, 0));
+    }
+    text.setCharacterSize(25);
+    b = text.getLocalBounds();
+    text.setPosition((S_WIDTH * 16) - b.width, ((S_HEIGHT + 3) * 16) / 2 - b.height - 75); //50
+    renderTexture.draw(text);
+
+    if (gen_idx == 1) {
+        text.setString("SAVE ---- SLOT_1");
+        text.setColor(sf::Color(255, 255, 255));
+    } else {
+        text.setString("SLOT_1");
+        text.setColor(sf::Color(0, 255, 0));
+    }
+    b = text.getLocalBounds();
+    text.setPosition((S_WIDTH * 16) - b.width, ((S_HEIGHT + 3) * 16) / 2 - b.height - 50); // 75
+    renderTexture.draw(text);
+
+    if (gen_idx == 2) {
+        text.setString("SAVE ---- SLOT_2");
+        text.setColor(sf::Color(255, 255, 255));
+    } else {
+        text.setString("SLOT_2");
+        text.setColor(sf::Color(0, 255, 0));
+    }
+    b = text.getLocalBounds();
+    text.setPosition((S_WIDTH * 16) - b.width, ((S_HEIGHT + 3) * 16) / 2 - b.height - 25); //100
+    renderTexture.draw(text);
+
+    if (gen_idx == 3) {
+        text.setString("SAVE ---- SLOT_3");
+        text.setColor(sf::Color(255, 255, 255));
+    } else {
+        text.setString("SLOT_3");
+        text.setColor(sf::Color(0, 255, 0));
+    }
+    b = text.getLocalBounds();
+    text.setPosition((S_WIDTH * 16) - b.width, ((S_HEIGHT + 3) * 16) / 2 - b.height); //125
+    renderTexture.draw(text);
+
+    if (gen_idx == 4) {
+        text.setString("SAVE ---- SLOT_4");
+        text.setColor(sf::Color(255, 255, 255));
+    } else {
+        text.setString("SLOT_4");
+        text.setColor(sf::Color(0, 255, 0));
+    }
+    b = text.getLocalBounds();
+    text.setPosition((S_WIDTH * 16) - b.width, ((S_HEIGHT + 3) * 16) / 2 - b.height + 25); //150
+    renderTexture.draw(text);
+
+    if (gen_idx == 5) {
+        text.setString("SAVE ---- SLOT_5");
+        text.setColor(sf::Color(255, 255, 255));
+    } else {
+        text.setString("SLOT_5");
+        text.setColor(sf::Color(0, 255, 0));
+    }
+    b = text.getLocalBounds();
+    text.setPosition((S_WIDTH * 16) - b.width, ((S_HEIGHT + 3) * 16) / 2 - b.height + 50); //175
+    renderTexture.draw(text);
+}
+
+std::string get_lvl_code(int lvl) {
+    if (lvl < 0) return "--";
+
+    if (lvl < 10) {
+        return "0" + patch::to_string(lvl);
+    }
+
+    return patch::to_string(lvl);
 }
 
 void draw_level_select(){
+    sf::Text text;
+    text.setString("a_game");
+    //text.setPosition(10,10);
+    text.setCharacterSize(50);
+    text.setColor(sf::Color(255, 255, 255)); // todo animate colors
+    text.setFont(font);
 
+    // center text
+    sf::FloatRect b = text.getLocalBounds();
+    text.setPosition(0, ((S_HEIGHT + 3) * 16) / 2 - b.height);
+
+    renderTexture.draw(text);
+
+    text.setString(":::LVL_SELECT:::");
+    text.setColor(sf::Color(255, 255, 255)); //003300
+    text.setCharacterSize(25);
+    b = text.getLocalBounds();
+    text.setPosition((S_WIDTH * 16) - b.width, ((S_HEIGHT + 3) * 16) / 2 - b.height - 75); //50
+    renderTexture.draw(text);
+
+    text.setString("           LVL" + get_lvl_code(gen_idx - 2));
+    text.setColor(sf::Color(0, 120, 0)); //004c0
+    b = text.getLocalBounds();
+    text.setPosition((S_WIDTH * 16) - b.width, ((S_HEIGHT + 3) * 16) / 2 - b.height - 50); // 75
+    renderTexture.draw(text);
+
+    text.setString("           LVL" + get_lvl_code(gen_idx - 1));
+    text.setColor(sf::Color(0, 255, 0)); // 00ff00
+    b = text.getLocalBounds();
+    text.setPosition((S_WIDTH * 16) - b.width, ((S_HEIGHT + 3) * 16) / 2 - b.height - 25); //100
+    renderTexture.draw(text);
+
+    text.setString("SELECT --- LVL" + get_lvl_code(gen_idx ));
+    text.setColor(sf::Color(255, 255, 255)); //ffffff
+    b = text.getLocalBounds();
+    text.setPosition((S_WIDTH * 16) - b.width, ((S_HEIGHT + 3) * 16) / 2 - b.height); //125
+    renderTexture.draw(text);
+
+    text.setString("           LVL" + get_lvl_code(gen_idx + 1));
+    text.setColor(sf::Color(0, 255, 0)); // 00ff00
+    b = text.getLocalBounds();
+    text.setPosition((S_WIDTH * 16) - b.width, ((S_HEIGHT + 3) * 16) / 2 - b.height + 25); //150
+    renderTexture.draw(text);
+
+    text.setString("           LVL" + get_lvl_code(gen_idx + 2));
+    text.setColor(sf::Color(0, 120, 0)); //004c00
+    b = text.getLocalBounds();
+    text.setPosition((S_WIDTH * 16) - b.width, ((S_HEIGHT + 3) * 16) / 2 - b.height + 50); //175
+    renderTexture.draw(text);
 }
 
 void draw_credits(){
+    sf::Text text;
+    text.setString("a_game");
+    //text.setPosition(10,10);
+    text.setCharacterSize(50);
+    text.setColor(sf::Color(255, 255, 255)); // todo animate colors
+    text.setFont(font);
 
+    // center text
+    sf::FloatRect b = text.getLocalBounds();
+    text.setPosition(0, ((S_HEIGHT + 3) * 16) / 2 - b.height);
+
+    renderTexture.draw(text);
+
+    text.setString("Design & Programming : HenryDane");
+    text.setColor(sf::Color(0, 120, 0)); //003300
+    text.setCharacterSize(25);
+    b = text.getLocalBounds();
+    text.setPosition((S_WIDTH * 16) - b.width, ((S_HEIGHT + 3) * 16) / 2 - b.height - 12); //50
+    renderTexture.draw(text);
+
+    text.setString("Music : Adhesive Wombat - www.soundcloud.com/adhesivewombat");
+    text.setColor(sf::Color(0, 120, 0)); //004c0
+    b = text.getLocalBounds();
+    text.setPosition((S_WIDTH * 16) - b.width, ((S_HEIGHT + 3) * 16) / 2 - b.height + 12); // 75
+    renderTexture.draw(text);
 }
 
 void draw_options(){
+    sf::Text text;
+    text.setString("a_game");
+    //text.setPosition(10,10);
+    text.setCharacterSize(50);
+    text.setColor(sf::Color(255, 255, 255)); // todo animate colors
+    text.setFont(font);
 
+    // center text
+    sf::FloatRect b = text.getLocalBounds();
+    text.setPosition(0, ((S_HEIGHT + 3) * 16) / 2 - b.height);
+
+    renderTexture.draw(text);
+
+    text.setString("Sound Down -[-");
+    text.setColor(sf::Color(0, 120, 0)); //003300
+    text.setCharacterSize(25);
+    b = text.getLocalBounds();
+    text.setPosition((S_WIDTH * 16) - b.width, ((S_HEIGHT + 3) * 16) / 2 - b.height - 25); //50
+    renderTexture.draw(text);
+
+    text.setString("Sound Up   -]-");
+    text.setColor(sf::Color(0, 120, 0)); //004c0
+    b = text.getLocalBounds();
+    text.setPosition((S_WIDTH * 16) - b.width, ((S_HEIGHT + 3) * 16) / 2 - b.height); // 75
+    renderTexture.draw(text);
+}
+
+void draw_game_saved(){
+    sf::Text text;
+    text.setString("a_game");
+    //text.setPosition(10,10);
+    text.setCharacterSize(50);
+    text.setColor(sf::Color(255, 255, 255)); // todo animate colors
+    text.setFont(font);
+
+    // center text
+    sf::FloatRect b = text.getLocalBounds();
+    text.setPosition(0, ((S_HEIGHT + 3) * 16) / 2 - b.height);
+
+    renderTexture.draw(text);
+
+    text.setString("SAVED GAME SUCCESSFULLY");
+    text.setColor(sf::Color(0, 255, 0));
+    text.setCharacterSize(25);
+    b = text.getLocalBounds();
+    text.setPosition((S_WIDTH * 16) - b.width, ((S_HEIGHT + 3) * 16) / 2 - b.height); //125
+    renderTexture.draw(text);
 }

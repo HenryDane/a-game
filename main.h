@@ -71,6 +71,8 @@ extern int level;
 
 extern int state;
 
+extern int turns;
+
 extern int global_uuid_next;
 
 extern bool regen_on;
