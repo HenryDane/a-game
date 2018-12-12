@@ -1,7 +1,6 @@
 #include <iostream>
 #include <fstream>
 #include "patch.h"
-#include "console.h"
 #include "main.h"
 #include "interact.h"
 #include "draw.h"
@@ -54,7 +53,7 @@ bool make_entity_at(int x, int y, int t){
         (t == 2 || t == 4)) return false;
 
     if ((signed int)entities.size() - 5 >= S_WIDTH * S_HEIGHT)
-        std::cout << "potential issues with placing entity at (" << x << "," << y << ") with type " << t << " (" << (signed int) entities.size() - 5 << " > " << S_WIDTH * S_HEIGHT << ")." << std::endl;
+        if (debug) std::cout << "potential issues with placing entity at (" << x << "," << y << ") with type " << t << " (" << (signed int) entities.size() - 5 << " > " << S_WIDTH * S_HEIGHT << ")." << std::endl;
 
     entity_overlap_check_on = true;
     if (entity_overlap_check_on){
@@ -64,7 +63,7 @@ bool make_entity_at(int x, int y, int t){
             get_registry_xy(i, x1, y1);
 
             if (x1 == x && y1 == y) {
-                std::cout << "    cancelled placing entity at (" << x << "," << y << ") with type " << t << std::endl;
+                if (debug) std::cout << "    cancelled placing entity at (" << x << "," << y << ") with type " << t << std::endl;
                 return false;
             }
         }
@@ -182,6 +181,8 @@ void do_gen_next_level(void){
 
     switch(level){
     case 0:
+        generate_tutorial();
+        break;
     case 1:
     case 2:
         generate_terrain();
@@ -233,7 +234,7 @@ void do_gen_next_level(void){
     player_set_safe(); // go to safe location
 
     // correct laser enemies
-    for (int i = 0; i < enemies.size(); i++){
+    for (unsigned int i = 0; i < enemies.size(); i++){
         if (enemies[i]._t != 2 && enemies[i]._t != 3) continue;
 
         if (enemies[i]._x == cha_x) enemies[i]._x--;
@@ -289,7 +290,13 @@ void do_new_game() {
 }
 
 void load_game(int slot) {
-    bool debug = false;
+    std::fstream file;
+    file.open("slot" + patch::to_string(slot), std::ios::in);
+    if (!file.is_open()) {
+        std::cout << "Failed to load slot" << slot << "!" << std::endl;
+        //abort();
+        return;
+    }
 
     // clean up lists
     registry.clear();
@@ -320,13 +327,6 @@ void load_game(int slot) {
     enemies.reserve(30);
     particles.reserve(100);
 
-    std::fstream file;
-    file.open("slot" + patch::to_string(slot), std::ios::in);
-    if (!file.is_open()) {
-        std::cout << "Failed to load slot" << slot << "! Unable to load!" << std::endl;
-        //abort();
-        return;
-    }
 
     std::string tmp;
     int t_size;
@@ -407,25 +407,25 @@ void load_game(int slot) {
 
         // write registry
         std::cout << registry.size() << std::endl;
-        for (int i = 0; i < registry.size(); i++) {
+        for (unsigned int i = 0; i < registry.size(); i++) {
             std::cout << i << " " << registry[i].id << " " << registry[i].ridx << " " << registry[i].rtype << " " << registry[i].type << " " << std::endl;
         }
 
         // write enemies
         std::cout << enemies.size() << std::endl;
-        for (int i = 0; i < enemies.size(); i++) {
+        for (unsigned int i = 0; i < enemies.size(); i++) {
             std::cout << i << " " << enemies[i]._id << " " << enemies[i]._score << " " << enemies[i]._state << " " << enemies[i]._t << " " << enemies[i]._x << " " << enemies[i]._y << " " << std::endl;
         }
 
         // write entities
         std::cout << entities.size() << std::endl;
-        for (int i = 0; i < entities.size(); i++) {
+        for (unsigned int i = 0; i < entities.size(); i++) {
             std::cout << i << " " << entities[i].t << " " << entities[i].x << " " << entities[i].y << " " << std::endl;
         }
 
         // write particles
         std::cout << particles.size() << std::endl;
-        for(int i = 0; i < particles.size(); i++){
+        for(unsigned int i = 0; i < particles.size(); i++){
             std::cout << i << " " << particles[i].ttl << " " << particles[i].type << " " << particles[i].x << " " << particles[i].y << " " << std::endl;
         }
 
@@ -435,11 +435,11 @@ void load_game(int slot) {
     }
 
     std::cout << "Done loading." << std::endl;
+
+    state = 17;
 }
 
 void save_game(int slot) {
-    bool debug = false;
-
     std::fstream file;
     file.open("slot" + patch::to_string(slot), std::ios::out);
     if (!file.is_open()) {
@@ -462,7 +462,7 @@ void save_game(int slot) {
     // write registry
     file << registry.size() << std::endl;
     if (debug) std::cout << registry.size() << std::endl;
-    for (int i = 0; i < registry.size(); i++) {
+    for (unsigned int i = 0; i < registry.size(); i++) {
         file << i << " " << registry[i].id << " " << registry[i].ridx << " " << registry[i].rtype << " " << registry[i].type << " " << std::endl;
         if (debug) std::cout << i << " " << registry[i].id << " " << registry[i].ridx << " " << registry[i].rtype << " " << registry[i].type << " " << std::endl;
     }
@@ -470,7 +470,7 @@ void save_game(int slot) {
     // write enemies
     file << enemies.size() << std::endl;
     if (debug) std::cout << enemies.size() << std::endl;
-    for (int i = 0; i < enemies.size(); i++) {
+    for (unsigned int i = 0; i < enemies.size(); i++) {
         file << i << " " << enemies[i]._id << " " << enemies[i]._score << " " << enemies[i]._state << " " << enemies[i]._t << " " << enemies[i]._x << " " << enemies[i]._y << " " << std::endl;
         if (debug) std::cout << i << " " << enemies[i]._id << " " << enemies[i]._score << " " << enemies[i]._state << " " << enemies[i]._t << " " << enemies[i]._x << " " << enemies[i]._y << " " << std::endl;
     }
@@ -478,7 +478,7 @@ void save_game(int slot) {
     // write entities
     file << entities.size() << std::endl;
     if (debug) std::cout << entities.size() << std::endl;
-    for (int i = 0; i < entities.size(); i++) {
+    for (unsigned int i = 0; i < entities.size(); i++) {
         file << i << " " << entities[i].t << " " << entities[i].x << " " << entities[i].y << " " << std::endl;
         if (debug) std::cout << i << " " << entities[i].t << " " << entities[i].x << " " << entities[i].y << " " << std::endl;
     }
@@ -486,7 +486,7 @@ void save_game(int slot) {
     // write particles
     file << particles.size() << std::endl;
     if (debug) std::cout << particles.size() << std::endl;
-    for(int i = 0; i < particles.size(); i++){
+    for(unsigned int i = 0; i < particles.size(); i++){
         file << i << " " << particles[i].ttl << " " << particles[i].type << " " << particles[i].x << " " << particles[i].y << " " << std::endl;
         if (debug) std::cout << i << " " << particles[i].ttl << " " << particles[i].type << " " << particles[i].x << " " << particles[i].y << " " << std::endl;
     }
@@ -503,10 +503,18 @@ void save_game(int slot) {
 }
 
 void goto_loaded_game() {
+    if (level == 0) {
+        cha_x = 2;
+        cha_y = 12;
+    }
     state = 1;
 }
 
 void select_load_level(int lvl) {
     level = lvl;
     do_gen_next_level();
+    if (level == 0) {
+        cha_x = 2;
+        cha_y = 12;
+    }
 }

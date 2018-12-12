@@ -5,7 +5,6 @@
 #include "patch.h"
 #include "main.h"
 #include "interact.h"
-#include "console.h"
 #include "game.h"
 
 std::vector<registry_key_t> registry;
@@ -17,12 +16,7 @@ int global_sprite_idx;
 bool init_registry (void){
     registry.clear();
     registry.reserve(200);
-/*
-    sprite_registry.clear();
-    sprite_registry.reserve(300);
 
-    global_sprite_idx = 0;
-*/
     return true;
 }
 
@@ -32,20 +26,9 @@ bool register_object(int id, int type, int ridx, int rtype){
     rk.type = type;
     rk.ridx = ridx;
     rk.rtype = rtype;
-/*
-    rk.tex_state = 0;
-    rk.t = 0;
-*/
+
     registry.push_back(rk);
-/*
-    sf::Sprite s;
-    {
-        int x, y = 0;
-        get_registry_xy(id, x, y);
-        s.setPosition(x, y);
-    }
-    sprite_registry.push_back(s);
-*/
+
     return true;
 }
 

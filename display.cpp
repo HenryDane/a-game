@@ -7,6 +7,7 @@ std::vector<sf::Texture> textures;
 sf::Font font;
 
 bool init_display(void){
+    textures.clear();
     for (int i = 0; i < NUM_TEX_FILES; i++){
         sf::Texture tex;
 
@@ -34,8 +35,8 @@ bool jumptex_xyt(int x, int y, std::string text){
     sf::Text text1;
     text1.setString(text);
     text1.setCharacterSize(TILE_WIDTH - 2);
-    text1.setPosition( (x * TILE_WIDTH) + 6, (y * TILE_WIDTH) );
-    text1.setColor(sf::Color(255, 255, 255));
+    text1.setPosition( (x * TILE_WIDTH) + 3, (y * TILE_WIDTH) );
+    text1.setFillColor(sf::Color(255, 255, 255));
     text1.setFont(font);
 
     renderTexture.draw(text1);
@@ -46,8 +47,8 @@ bool jumptex_xyt(int x, int y, std::string text, sf::Color c){
     sf::Text text1;
     text1.setString(text);
     text1.setCharacterSize(TILE_WIDTH - 2);
-    text1.setPosition( (x * TILE_WIDTH) + 6, (y * TILE_WIDTH));
-    text1.setColor(c);
+    text1.setPosition( (x * TILE_WIDTH) + 3, (y * TILE_WIDTH));
+    text1.setFillColor(c);
     text1.setFont(font);
 
     renderTexture.draw(text1);
@@ -62,6 +63,8 @@ bool sf_line(float x1, float y1, float x2, float y2){
     };
 
     renderTexture.draw(line, 2, sf::Lines);
+
+    return true;
 }
 
 bool clear_display(void){

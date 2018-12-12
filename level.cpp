@@ -172,7 +172,7 @@ int gen_maze(int w, int h){
 
 	for (int y = 0; y < h; y++){
 		for (int x = 0; x < w; x++){
-			/*ln1 += "O" + patch::to_string((g[y * w + x].n) ? " " : "#") + "O";
+			/*ln1 += "O" + patch::to_str(S_WIDTH * 16) - b.widthing((g[y * w + x].n) ? " " : "#") + "O";
 			ln2 += patch::to_string((g[y * w + x].e) ? " " : "#") + patch::to_string((g[y * w + x].visited) ? " " : "#") + patch::to_string((g[y * w + x].w) ? " " : "#");
 			ln3 += "O" + patch::to_string((g[y * w + x].s) ? " " : "#") + "O";*/
 			// corners
@@ -271,6 +271,8 @@ bool generate_maze(void ) {
     make_entity_at(S_WIDTH - 1, 1, 5);
     make_entity_at(S_WIDTH - 1, S_HEIGHT - 2, 5);
     make_entity_at(1, S_HEIGHT - 2, 5);
+
+    return true;
 }
 
 bool generate_lasers(void) {

@@ -7,14 +7,12 @@
 #include <ctime>
 #include "main.h"
 #include "display.h"
-#include "console.h"
 #include "game.h"
 #include "interact.h"
 #include "patch.h"
-#include "tex_print.h"
 #include "draw.h"
 #include "audio.h"
-#include "level.h"\
+#include "level.h"
 
 // globals lol
 int cha_x = S_WIDTH / 2;
@@ -36,6 +34,8 @@ bool dots_on = false; // flag for dots display
 bool entity_spawn_lock = false; // flag for deleting everything nearby
 bool entity_overlap_check_on = false; // prevent overlap spawn
 bool respawn_bomb_on = true;
+bool debug = false;
+bool cheats = false;
 
 // menu shenanigans
 int gen_idx = 0;
@@ -43,49 +43,6 @@ int gen_idx_ulim = 7; // exclusive
 
 // GAME STATE
 int state = 0;
-/*
-    NOW:
-        S0 : title screen
-         key ' ' -> S3
-        S1 : normal game
-         key WASD/Q/E, etc -> game
-         lvl door -> S2
-        S2 : level screen
-         key ' ' -> S1
-        S3 : pretutorial
-         key ' ' -> S1
-
-    TODO:
-        S0 : title
-         key ' ' -> S10
-        S1 : normal
-        S2 : level
-         lvl door -> S2
-        S3 : pretutorial [remove?]
-         key ' ' -> S1
-
-        S10 : main menu
-        S11 : new game
-         key ' ' -> S3
-        S12 : load / save game
-         { see key handler } -> save|load|back|resume
-         { various } -> S1|S10
-        S14 : level select
-         { see key handler }
-        S15 : options
-         { see key handler }
-        S16 : credits
-         key ' ' -> S10
-
-        S* : any/all
-         death -> S4
-
-        S4 : death [verify]
-         * -> S14
-        S5 : win [verify]
-         * -> S15
-
-*/
 
 // newline
 char __NL = 10;
@@ -150,18 +107,20 @@ int main(){
                     skip_current_song();
                 }
 
-                /*else if (event.key.code == sf::Keyboard::Add) {
-                    state++;
-                } else if (event.key.code == sf::Keyboard::Subtract) {
-                    state--;
-                } else if (event.key.code == sf::Keyboard::Enter) {
-                    std::cout << "State: " << state << std::endl;
-                } else if (event.key.code == sf::Keyboard::Tab) {
-                    //std::cout << music.getPlayingOffset().asSeconds() << " | " << music.getDuration().asSeconds() << std::endl;
-                    score += 1000;
-                } else if (event.key.code == sf::Keyboard::Tilde) { // conflict with menu key`
-                    skip_seconds(30);
-                } */
+                if (cheats) {
+                    if (event.key.code == sf::Keyboard::Add) {
+                        state++;
+                    } else if (event.key.code == sf::Keyboard::Subtract) {
+                        state--;
+                    } else if (event.key.code == sf::Keyboard::Enter) {
+                        std::cout << "State: " << state << std::endl;
+                    } else if (event.key.code == sf::Keyboard::Tab) {
+                        //std::cout << music.getPlayingOffset().asSeconds() << " | " << music.getDuration().asSeconds() << std::endl;
+                        score += 1000;
+                    } else if (event.key.code == sf::Keyboard::Tilde) { // conflict with menu key`
+                        skip_seconds(30);
+                    }
+                }
 
                 if (state >= 10) {
                     if (event.key.code == sf::Keyboard::Numpad8 ||
@@ -210,7 +169,10 @@ int main(){
                             case 0: state = 11; break;
                             case 1: state = 12; break;
                             case 2: state = 13; break;
-                            case 3: state = 14; break;
+                            case 3:
+                                state = 14;
+                                gen_idx = level;
+                                break;
                             case 4: state = 15; break;
                             case 5: state = 16; break;
                             default: break;
@@ -226,7 +188,6 @@ int main(){
                         event.key.code == sf::Keyboard::Numpad6 ||
                         event.key.code == sf::Keyboard::D) {
                         load_game(gen_idx);
-                        state = 17;
                     } else if (event.key.code == sf::Keyboard::Left ||
                         event.key.code == sf::Keyboard::Numpad4 ||
                         event.key.code == sf::Keyboard::A) {
@@ -263,7 +224,35 @@ int main(){
                 case 16: // options
                     // TODO (add main menu option)
                     // TODO (add resume game option (only if there is a valid game ready))
-                    if (event.key.code == sf::Keyboard::Left ||
+                    if (event.key.code == sf::Keyboard::Right ||
+                        event.key.code == sf::Keyboard::Numpad6 ||
+                        event.key.code == sf::Keyboard::D) {
+                        switch (gen_idx) {
+                        case 0:
+                            // vol adjust
+                            break;
+                        case 1:
+                            // debug
+                            debug = !debug;
+                            break;
+                        case 2:
+                            // cheats
+                            cheats = !cheats;
+                            break;
+                        case 3:
+                            // reload audio
+                            update_sound();
+                            break;
+                        case 4:
+                            // reload gfx
+                            init_display();
+                            break;
+                        case 5:
+                            if (debug) std::cout << "Save erasure is not implemented" << std::endl;
+                            // erase all saves
+                            break;
+                        }
+                    } else if (event.key.code == sf::Keyboard::Left ||
                         event.key.code == sf::Keyboard::Numpad4 ||
                         event.key.code == sf::Keyboard::A) {
                         state = 10;
@@ -337,6 +326,8 @@ int main(){
             draw_credits();
             break;
         case 16: // options
+            if (gen_idx < 1) gen_idx = 1;
+            if (gen_idx > 5) gen_idx = 5;
             draw_options();
             break;
         case 17: // press any key to begin loaded game
@@ -474,7 +465,7 @@ int handle_key(sf::Keyboard::Key k){
     }
 
     // handle particles
-    for (int i = 0; i < particles.size(); i++){
+    for (unsigned int i = 0; i < particles.size(); i++){
         particles[i].ttl --;
 
         if (particles[i].ttl < 0) {

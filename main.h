@@ -80,6 +80,8 @@ extern int timer_on;
 extern bool entity_spawn_lock;
 extern bool entity_overlap_check_on;
 extern bool respawn_bomb_on;
+extern bool cheats;
+extern bool debug;
 
 int handle_key(sf::Keyboard::Key k);
 
