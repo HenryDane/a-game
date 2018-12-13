@@ -51,7 +51,7 @@ bool make_entity_at(int x, int y, int t){
         abs(x - cha_x) <= 2 &&
         abs(y - cha_y) <= 2 &&
         (t == 2 || t == 4)){
-        std::cout << "P: " << x << " " << y << " C: " << cha_x << " " << cha_y  << " N: " << S_WIDTH / 2 << " " << S_HEIGHT / 2 << " " << std::endl;
+        if (debug) std::cout << "P: " << x << " " << y << " C: " << cha_x << " " << cha_y  << " N: " << S_WIDTH / 2 << " " << S_HEIGHT / 2 << " " << std::endl;
         t = 3;
     }
 

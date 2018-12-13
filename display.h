@@ -18,10 +18,12 @@
 #define HLASER_PRE_BEAM_TEX 16
 
 #define CHAR_TEX 13
+#define CHAR_SHIELD_TEX 18
+#define CHAR_LSHIELD_TEX 19
 
 #define FLOOR_TEX 14
 
-#define NUM_TEX_FILES 18
+#define NUM_TEX_FILES 20
 
 #include <SFML/Graphics.hpp>
 #include <vector>

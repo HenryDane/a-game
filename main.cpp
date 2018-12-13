@@ -424,7 +424,7 @@ int handle_key(sf::Keyboard::Key k){
             level != 7 &&
             level != 8 &&
             level != 9) { // activates ten turn shield for a score cost of 5
-            shield = 10;
+            shield += 10;
             score -= 5;
         }
         break;

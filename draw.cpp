@@ -155,7 +155,13 @@ void draw_gfx(void) {
     jumptex_xyt(0, 0, "SCORE: " + patch::to_string(score) + " SHIELD: " + patch::to_string(((shield <= 0) ? 0 : shield)) + " LEVEL: " + patch::to_string(level) + " TIMER: " + ((timer_on < 0) ? "infinite" : patch::to_string(timer_on)));
     jumptex_xyt(0, 1, "S:" + patch::to_string(state) + " P:" + patch::to_string(particles.size()) + " E:" + patch::to_string(entities.size()) + " M:" + patch::to_string(enemies.size()) + " A:" + patch::to_string(current_music_state));
 
-    jumpwr_xyt(cha_x, cha_y + 2, CHAR_TEX);
+    if (shield <= 0) {
+        jumpwr_xyt(cha_x, cha_y + 2, CHAR_TEX);
+    } else if (shield > 0 && shield < 4) {
+        jumpwr_xyt(cha_x, cha_y + 2, CHAR_LSHIELD_TEX);
+    } else {
+        jumpwr_xyt(cha_x, cha_y + 2, CHAR_SHIELD_TEX);
+    }
 }
 
 void draw_title_screen(){
